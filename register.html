@@ -1,68 +1,211 @@
-<!DOCTYPE html>
+    });<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Check by Gourab</title>
+    <title>Register | Secure Panel v1</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .register-container { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { text-align: center; color: #333; }
-        .input-group { margin-bottom: 15px; position: relative; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        .toggle-password { position: absolute; right: 10px; top: 12px; cursor: pointer; font-size: 18px; }
-        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background-color: #0056b3; }
-        .footer-text { text-align: center; margin-top: 15px; font-size: 14px; color: #666; }
+        /* এনিমেটেড ডার্ক গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড */
+        body {
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #00d2ff);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* গ্লাস কার্ড ডিজাইন */
+        .register-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            padding: 45px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .register-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .register-card h2 {
+            color: #00d2ff;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .register-card p {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            margin-bottom: 35px;
+        }
+
+        /* ইনপুট ফিল্ড ডিজাইন */
+        .input-group {
+            position: relative;
+            margin-bottom: 22px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 18px;
+            top: 15px;
+            color: #00d2ff;
+            z-index: 10;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 15px !important;
+            padding: 14px 15px 14px 50px !important;
+            color: #fff !important;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: #00d2ff !important;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* পাসওয়ার্ড শো/হাইড বাটন */
+        .toggle-password {
+            position: absolute;
+            right: 18px;
+            top: 15px;
+            cursor: pointer;
+            color: #bdc3c7;
+            z-index: 10;
+            transition: 0.3s;
+        }
+
+        .toggle-password:hover {
+            color: #00d2ff;
+        }
+
+        /* প্রিমিয়াম বাটন */
+        .btn-register {
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            border: none;
+            border-radius: 15px;
+            padding: 14px;
+            width: 100%;
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            transition: 0.4s;
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2);
+        }
+
+        .btn-register:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 25px rgba(0, 210, 255, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* নিচের লিঙ্ক */
+        .footer-text {
+            margin-top: 25px;
+            color: #bdc3c7;
+            font-size: 0.85rem;
+        }
+
+        .footer-text a {
+            color: #00d2ff;
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
-<div class="register-container">
-    <h2>নতুন একাউন্ট তৈরি করুন</h2>
-    <form id="registerForm">
-        <div class="input-group">
-            <input type="text" id="username" placeholder="আপনার নাম" required>
-        </div>
-        <div class="input-group">
-            <input type="email" id="email" placeholder="ইমেইল এড্রেস" required>
-        </div>
-        <div class="input-group">
-            <input type="password" id="password" placeholder="পাসওয়ার্ড" required>
-            <span class="toggle-password" onclick="togglePassword()" id="toggleIcon">🙈</span>
-        </div>
-        <button type="submit">রেজিস্টার করুন</button>
-    </form>
-    <p class="footer-text">ইতিমধ্যে একাউন্ট আছে? <a href="login.html">লগইন করুন</a></p>
-</div>
+    <div class="register-card">
+        <h2>Register</h2>
+        <p>নতুন অ্যাকাউন্ট তৈরি করুন</p>
+        
+        <form id="registerForm">
+            <div class="input-group">
+                <i class="fas fa-user-tag"></i>
+                <input type="text" class="form-control" placeholder="আপনার পুরো নাম" required>
+            </div>
 
-<script>
-    // পাসওয়ার্ড দেখা বা লুকানোর ফাংশন
-    function togglePassword() {
-        const passwordInput = document.getElementById("password");
-        const toggleIcon = document.getElementById("toggleIcon");
-        if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            toggleIcon.innerText = "👁️";
-        } else {
-            passwordInput.type = "password";
-            toggleIcon.innerText = "🙈";
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" class="form-control" placeholder="ইমেইল এড্রেস" required>
+            </div>
+            
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="regPassword" class="form-control" placeholder="শক্তিশালী পাসওয়ার্ড দিন" required>
+                <span class="toggle-password" onclick="togglePass('regPassword', 'regEyeIcon')">
+                    <i class="fas fa-eye-slash" id="regEyeIcon"></i>
+                </span>
+            </div>
+
+            <button type="submit" class="btn-register">অ্যাকাউন্ট খুলুন</button>
+        </form>
+
+        <div class="footer-text">
+            আগে থেকেই অ্যাকাউন্ট আছে? <a href="login.html">লগইন করুন</a>
+        </div>
+    </div>
+
+    <script>
+        // আপনার বিশেষ সতর্কবার্তা ও সাবমিট হ্যান্ডলার
+        document.getElementById("registerForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            alert("গৌরব ভাইয়ের এই সাইটে রেজিস্টার করার জন্য আপনাকে অনেক অনেক ধন্যবাদ 🙏\n\nএই সাইট থেকে কোন ডাটা বা admin এর personal কোনো information কিছু নেওয়ার চেষ্টা করবেন না। যদি নেওয়ার চেষ্টা করেন আপনাকে সাইট থেকে ব্লক করা হবে।");
+        });
+
+        // পাসওয়ার্ড দেখানো বা লুকানোর ফাংশন
+        function togglePass(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("fa-eye-slash", "fa-eye");
+            } else {
+                input.type = "password";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
+            }
         }
-    }
-
-    // রেজিস্ট্রেশন ফর্ম সাবমিট
-    document.getElementById("registerForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        
-        // আপনার বলা সেই বিশেষ মেসেজ
-        const customMessage = "গৌরব ভাইয়ের এই সাইটে রেজিস্টার করার জন্য আপনাকে অনেক অনেক ধন্যবাদ 🙏\n\nএই সাইট থেকে কোন ডাটা বা admin এর personal কোনো information কিছু নেওয়ার চেষ্টা করবেন না। যদি নেওয়ার চেষ্টা করেন আপনাকে সাইট থেকে ব্লক করা হবে। ভদ্রভাবে কাজ করার জন্য ধন্যবাদ। কোন কিছু হলে অ্যাডমিনকে বলুন।";
-        
-        alert(customMessage);
-        
-        // এখানে আপনার ব্যাকএন্ডে ডাটা পাঠানোর কোড থাকবে
-        console.log("Registration attempt...");
-    });
-</script>
+    </script>
 
 </body>
 </html>
