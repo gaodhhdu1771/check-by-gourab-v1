@@ -19,8 +19,7 @@ const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.use('/api/', limiter);
 
 // MongoDB Connection
-mongoose.connect("mongodb+srv://gourabadmin:gourab2006@cluster0.xiyfnuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-.then(() => console.log('Check by Gourab DB Connected'))
+mongoose.connect(process.env.MONGO_URI
 .catch(err => console.log(err));
 
 // Routes
