@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dashboard | Check by Gourab-v1</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand">Check by Gourab-v1</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="alert alert-info custom-card text-center mb-4">
+            গৌরব ভাইয়ের এই সাইটে আপনাকে স্বাগতম। এই সাইটে আপনি আপনার প্রয়োজনের সবকিছু পেয়ে যাবেন। ভদ্রতার সাথে কাজ করুন এবং কোন সমস্যা হলে গৌরব ভাইকে বলুন। ধন্যবাদ।
+        </div>
+
+        <div class="row g-3" id="tool-grid">
+            <div class="col-6 col-md-3" onclick="loadTool('gmail')">
+                <div class="custom-card text-center"><i class="fas fa-envelope fa-2x"></i><br>Gmail Slit</div>
+            </div>
+            <div class="col-6 col-md-3" onclick="loadTool('ip')">
+                <div class="custom-card text-center"><i class="fas fa-network-wired fa-2x"></i><br>Ip Slit</div>
+            </div>
+            <div class="col-6 col-md-3" onclick="loadTool('fb')">
+                <div class="custom-card text-center"><i class="fab fa-facebook fa-2x"></i><br>Facebook Slit</div>
+            </div>
+            <div class="col-6 col-md-3" onclick="loadTool('tg')">
+                <div class="custom-card text-center"><i class="fab fa-telegram fa-2x"></i><br>Tg Slit</div>
+            </div>
+            <div class="col-6 col-md-3" onclick="loadTool('2fa')">
+                <div class="custom-card text-center"><i class="fas fa-key fa-2x"></i><br>2FA Slit</div>
+            </div>
+            <div class="col-6 col-md-3" onclick="loadTool('report')">
+                <div class="custom-card text-center"><i class="fas fa-file-invoice fa-2x"></i><br>Report Slot</div>
+            </div>
+            <div class="col-6 col-md-3" onclick="loadTool('timezone')">
+                <div class="custom-card text-center"><i class="fas fa-clock fa-2x"></i><br>IP Timezone</div>
+            </div>
+            <div class="col-6 col-md-3" onclick="loadTool('generator')">
+                <div class="custom-card text-center"><i class="fas fa-random fa-2x"></i><br>Generator</div>
+            </div>
+        </div>
+
+        <div id="tool-interface" class="mt-4 pb-5"></div>
+    </div>
+
+    <div class="footer">develop By gourab Number: 01944035239</div>
+    <script src="js/checkers.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
