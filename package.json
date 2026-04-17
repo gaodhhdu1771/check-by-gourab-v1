@@ -1,0 +1,17 @@
+{
+  "name": "check-by-gourab-v1",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0",
+    "dotenv": "^16.0.3",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^6.7.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
