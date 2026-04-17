@@ -6,36 +6,33 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     
-    // ইউজার রোল (অ্যাডমিন চাইলে ম্যানেজার বা সাপোর্ট নিয়োগ দিতে পারবে)
+    // ইউজার রোল (অ্যাডমিন চাইলে কাউকে ম্যানেজার বানাতে পারবে)
     role: { 
         type: String, 
-        enum: ['user', 'manager', 'support_admin', 'admin'], 
+        enum: ['user', 'manager', 'admin'], 
         default: 'user' 
     },
     
-    // স্ট্যাটাস (অ্যাডমিন প্যানেল থেকে ব্লক বা অ্যাপ্রুভ করার জন্য)
+    // অ্যাকাউন্ট স্ট্যাটাস (অ্যাডমিন ব্লক করলে সে আর ঢুকতে পারবে না)
     status: { 
         type: String, 
         enum: ['Pending', 'Approved', 'Blocked'], 
         default: 'Pending' 
     },
 
-    // অ্যাডমিন যে পারমিশনগুলো কন্ট্রোল করবে
+    // প্রিমিয়াম স্ট্যাটাস (টাকা দিয়েছে কি না)
+    isPremium: { type: Boolean, default: false },
+
     permissions: {
-        canBlock: { type: Boolean, default: false },
-        canApprove: { type: Boolean, default: false },
         viewAdminInfo: { type: Boolean, default: false },
-        
-        // কোন ৮টি চেকার ইউজার দেখতে পারবে তার লিস্ট
-        activeCheckers: { 
-            type: [String], 
-            default: ['Checker1', 'Checker2', 'Checker3', 'Checker4', 'Checker5', 'Checker6', 'Checker7', 'Checker8'] 
-        }
+        // অ্যাডমিন যাকে যাকে পারমিশন দিবে সে সেই চেকার দেখবে
+        activeCheckers: { type: [String], default: [] } 
     },
 
-    // ইনভাইটেশন এবং রেফারেল ট্র্যাকিং
-    invitedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    // কে ইনভাইট করেছে তার রেকর্ড
+    invitedBy: { type: String, default: "Direct" },
     
+    // ইউজার কবে জয়েন করেছে
     createdAt: { type: Date, default: Date.now }
 });
 
