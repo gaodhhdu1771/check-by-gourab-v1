@@ -68,8 +68,6 @@
             box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3);
         }
         .btn-auth:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(0, 210, 255, 0.4); opacity: 0.9; }
-        
-        /* ডাইনামিক মেসেজ স্টাইল */
         #dynamicMsg { color: #bbb; margin-bottom: 35px; font-size: 0.95rem; line-height: 1.4; }
     </style>
 </head>
@@ -78,7 +76,7 @@
         <div class="logo-area"><i class="fas fa-shield-alt"></i></div>
         <h2 style="color: #fff; font-weight: 800; letter-spacing: 2px;">LOGIN</h2>
         
-        <p id="dynamicMsg">Loading settings...</p>
+        <p id="dynamicMsg">অপেক্ষা করুন...</p>
         
         <form id="loginForm">
             <div class="input-group">
@@ -99,12 +97,16 @@
     </div>
 
     <script>
-        // ১. পেজ লোড হলে অ্যাডমিনের সেট করা মেসেজ নিয়ে আসা
+        // ১. পেজ লোড হলে সেটিংস নিয়ে আসা
         window.onload = async () => {
             try {
                 const res = await fetch('/api/admin/get-settings');
-                const settings = await res.json();
-                document.getElementById('dynamicMsg').innerText = settings.loginWelcomeMessage || "আমাদের প্যানেলে আপনাকে স্বাগতম";
+                if (res.ok) {
+                    const settings = await res.json();
+                    document.getElementById('dynamicMsg').innerText = settings.loginWelcomeMessage || "আমাদের প্যানেলে আপনাকে স্বাগতম";
+                } else {
+                    document.getElementById('dynamicMsg').innerText = "আমাদের প্যানেলে আপনাকে স্বাগতম";
+                }
             } catch (err) {
                 document.getElementById('dynamicMsg').innerText = "আমাদের প্যানেলে আপনাকে স্বাগতম";
             }
@@ -122,9 +124,13 @@
             }
         }
 
-        // ২. লগইন ফাংশন
+        // ২. লগইন ফাংশন (উন্নত করা হয়েছে)
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = "অপেক্ষা করুন...";
+            btn.disabled = true;
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
@@ -134,17 +140,21 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
+                
                 const data = await res.json();
                 
                 if (res.ok) {
-                    alert(data.message);
+                    alert("লগইন সফল!");
                     window.location.href = data.redirect;
                 } else {
-                    // সার্ভার থেকে আসা সঠিক এরর মেসেজ (যেমন: "Account Blocked" বা "Wrong Password")
-                    alert(data.error);
+                    alert(data.error || "লগইন ব্যর্থ হয়েছে!");
                 }
             } catch (err) {
-                alert("কানেকশন এরর! দয়া করে রেন্ডার লিংক ব্যবহার করুন (লোকাল ফাইল নয়)।");
+                // এখানে সেই পুরনো মেসেজটি সরিয়ে সাধারণ মেসেজ দেওয়া হয়েছে
+                alert("সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। দয়া করে আপনার ইন্টারনেট চেক করুন।");
+            } finally {
+                btn.innerText = "প্রবেশ করুন";
+                btn.disabled = false;
             }
         });
     </script>
