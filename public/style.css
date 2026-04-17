@@ -1,0 +1,40 @@
+:root {
+    --primary: #00d2ff;
+    --secondary: #3a7bd5;
+    --dark: #0f172a;
+    --card: #1e293b;
+}
+
+body {
+    background: var(--dark);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+}
+
+.custom-card {
+    background: var(--card);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 20px;
+    transition: 0.3s;
+}
+
+.custom-card:hover { transform: translateY(-5px); }
+
+.btn-gourab {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    border: none; color: white; border-radius: 8px;
+}
+
+.footer {
+    text-align: center; padding: 20px;
+    background: #000; position: fixed; bottom: 0; width: 100%;
+}
+
+/* Sidebar Styling */
+#sidebar {
+    height: 100vh; background: #000; width: 250px;
+    position: fixed; left: 0; top: 0; padding-top: 20px;
+}
