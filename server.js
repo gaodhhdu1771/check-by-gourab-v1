@@ -42,14 +42,22 @@ app.use(requestIp.mw());
 app.use(useragent.express());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- ২. ডাটাবেস কানেকশন ---
-const mongoURI = "mongodb+srv://gourabadmin:gourab2006@cluster0.xiyfnuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-mongoose.connect(mongoURI)
-    .then(async () => {
-        console.log("✅ Ultra Core Connected!");
-        if (!(await Settings.findOne())) await Settings.create({});
-    })
-    .catch(err => console.log("❌ DB Error"));
+// --- ২. ডাটাবেস কানেকশন (Render Environment Support) ---
+// Render-এ সেট করা MONGO_URI ব্যবহার করবে, না থাকলে হার্ডকোড লিঙ্ক নিবে
+const mongoURI = process.env.MONGO_URI || "mongodb+srv://gourabadmin:gourab2006@cluster0.xiyfnuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+mongoose.connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(async () => {
+    console.log("✅ Database Connected Successfully!");
+    const settings = await Settings.findOne();
+    if (!settings) await Settings.create({ isSiteActive: true });
+})
+.catch(err => {
+    console.log("❌ MongoDB Connection Error:", err.message);
+});
 
 // --- ৩. আল্ট্রা এপিআই রাউটস ---
 
@@ -87,15 +95,15 @@ app.post('/api/auth/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: "ভুল পাসওয়ার্ড!" });
 
-        // লগইন ডিভাইস ও আইপি আপডেট (আপনার Infinix Hot 50i ট্র্যাকিংয়ের জন্য)
+        // লগইন ডিভাইস আপডেট (আপনার Infinix Hot 50i ট্র্যাকিংয়ের জন্য)
         user.securityInfo.lastLoginDate = new Date();
         user.securityInfo.loginDevice = req.useragent.platform + " - " + req.useragent.os;
         await user.save();
 
         const settings = await Settings.findOne();
         res.status(200).json({ 
-            message: settings.loginWelcomeMessage || "Welcome to Gourab Panel",
-            userId: user._id, // ফ্রন্টএন্ডে প্রোফাইল টানার জন্য
+            message: settings?.loginWelcomeMessage || "Welcome to Gourab Panel",
+            userId: user._id,
             redirect: user.role === 'admin' ? "/admin-control.html" : "/dashboard.html"
         });
     } catch (err) {
@@ -103,17 +111,18 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// ইউজারের নিজস্ব প্রোফাইল ও পারমিশন দেখা (Dashboard-এর জন্য)
+// ইউজারের নিজস্ব প্রোফাইল ও পারমিশন দেখা
 app.get('/api/user/me/:id', async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id).select('-password');
+        if (!user) return res.status(404).json({ error: "ইউজার পাওয়া যায়নি!" });
         res.json(user);
     } catch (err) {
-        res.status(404).json({ error: "User not found" });
+        res.status(500).json({ error: "সার্ভারে সমস্যা!" });
     }
 });
 
-// অ্যাডমিন: সব ইউজার লিস্ট দেখা
+// অ্যাডমিন রাউটগুলো আগের মতোই থাকবে...
 app.get('/api/admin/users', async (req, res) => {
     try {
         const users = await User.find({ role: { $ne: 'admin' } });
@@ -123,11 +132,9 @@ app.get('/api/admin/users', async (req, res) => {
     }
 });
 
-// অ্যাডমিন: ৮টি চেকার ও স্ট্যাটাস ম্যানেজ করা
 app.post('/api/admin/manage-user', async (req, res) => {
     try {
         const { userId, status, checkers } = req.body; 
-        // আপনার নতুন মডেলে activeCheckers আপডেট করা
         await User.findByIdAndUpdate(userId, { 
             status: status, 
             "permissions.activeCheckers": checkers 
@@ -138,7 +145,6 @@ app.post('/api/admin/manage-user', async (req, res) => {
     }
 });
 
-// সেটিংস API
 app.get('/api/admin/get-settings', async (req, res) => {
     const settings = await Settings.findOne();
     res.json(settings);
@@ -153,6 +159,7 @@ app.post('/api/admin/update-settings', async (req, res) => {
     }
 });
 
+// ক্যাচ-অল রাউট: অন্য কোনো ইউআরএল না মিললে লগইন পেজ দেখাবে
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
