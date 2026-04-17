@@ -2,28 +2,72 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Pending | Gourab Panel</title>
-    <style>
-        body { background: #0f0c29; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; text-align: center; padding: 20px; }
-        .box { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid #00d2ff; max-width: 500px; }
-        h2 { color: #ffcc00; }
-        p { line-height: 1.6; color: #ccc; }
-        .warning { color: #ef4444; font-weight: bold; margin-top: 20px; border: 1px dashed red; padding: 10px; }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Verification | Check by Gourab-v1</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css"> <style>
+        body { overflow: hidden; }
+        .app-container {
+            width: 100%; height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 20px; text-align: center;
+        }
+        .status-icon {
+            width: 80px; height: 80px;
+            background: rgba(0, 210, 255, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px;
+            border: 2px solid var(--primary);
+            box-shadow: var(--neon-shadow);
+        }
+        .policy-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 1px solid var(--glass-border);
+            max-width: 350px;
+        }
+        .feature-tag {
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-    <div class="box">
-        <i class="fas fa-clock" style="font-size: 50px; color: #00d2ff;"></i>
-        <h2>অ্যাকাউন্টটি এখনো পেন্ডিং!</h2>
-        <p>আপনার অ্যাকাউন্টটি সফলভাবে তৈরি হয়েছে, কিন্তু এটি ব্যবহারের জন্য অ্যাডমিনের অনুমতি প্রয়োজন।</p>
-        
-        <div class="warning">
-            ওয়ার্নিং: সাইটে কোনো প্রকার অবৈধ কাজ বা হ্যাকিং এর চেষ্টা করবেন না। করলে আপনার আইপি সহ চিরতরে ব্লক করা হবে।
+
+    <div class="app-container">
+        <div class="status-icon">
+            <i class="fas fa-user-shield fa-2x" style="color: var(--primary);"></i>
         </div>
         
-        <p style="margin-top: 20px;">অনুমতির জন্য গৌরবের সাথে যোগাযোগ করুন।</p>
-        <a href="login.html" style="color: #00d2ff; text-decoration: none;">লগইন পেজে ফিরুন</a>
+        <div class="feature-tag">Security Protocol Active</div>
+        
+        <h2 class="neon-text">Account Under Review</h2>
+        <p style="color: #aaa; font-size: 0.9rem;">গৌরব টেকনোলজি প্যানেলে আপনাকে স্বাগতম। আপনার অ্যাকাউন্টটি বর্তমানে আমাদের সিকিউরিটি টিম যাচাই করছে।</p>
+
+        <div class="policy-box">
+            <h6 style="color: #fff; font-weight: 700;">প্রফেশনাল গাইডলাইন:</h6>
+            <p style="font-size: 0.8rem; color: #bdc3c7; text-align: justify;">
+                গুগল এবং আমাদের সিস্টেমের নিরাপত্তা নিশ্চিত করতে সাইটে কোনো অস্বাভাবিক কার্যক্রম করবেন না। আমাদের উন্নত **Cloud-Security** সিস্টেম সবসময় আপনার ডেটা সুরক্ষিত রাখে। সিস্টেমের নিয়ম ভঙ্গ করলে আপনার প্রবেশাধিকার চিরতরে বাতিল করা হতে পারে।
+            </p>
+        </div>
+
+        <div style="margin-top: 30px; width: 100%; max-width: 300px;">
+            <button class="btn-gourab w-100" onclick="location.reload()">Status Refresh</button>
+            <p style="margin-top: 15px; font-size: 0.8rem;">
+                <a href="login.html" style="color: var(--primary); text-decoration: none;">Back to Login</a>
+            </p>
+        </div>
     </div>
-</body>
+
+    <div class="bg-glow"></div> </body>
 </html>
