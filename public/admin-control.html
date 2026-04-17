@@ -117,138 +117,205 @@
         .checkers-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Admin V2 | Gourab Tech</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0f141e;
+            --card-bg: #1a202c;
+            --accent-cyan: #00d2ff;
+            --btn-green: #22c55e;
+            --btn-red: #ef4444;
+            --text-gray: #a0aec0;
         }
 
-        .checker-item {
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: white; padding: 20px; }
+
+        .container { width: 100%; max-width: 600px; margin: auto; }
+        h1 { text-align: center; color: var(--accent-cyan); font-size: 1.8rem; margin: 20px 0; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* প্রধান কার্ড স্টাইল (আপনার ২য় ছবির মতো) */
+        .control-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .card-header {
+            color: var(--accent-cyan);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 10px;
-            border-radius: 8px;
         }
 
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+        /* বাটন স্টাইল */
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            color: white;
             cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-on { background: var(--btn-green); }
+        .btn-off { background: var(--btn-red); }
+        .btn-update { 
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5); 
+            width: 100%; margin-top: 15px; 
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* ইনপুট বক্স */
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            background: #0b0f16;
+            border: 1px solid #2d3748;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
         }
 
-        /* Responsive */
-        @media (max-width: 500px) {
-            h1 { font-size: 1.5rem; }
-            .button-group { flex-direction: column; }
-            .checkers-grid { grid-template-columns: 1fr; }
+        /* ইউজার কন্ট্রোল সেকশন (নিচে থাকবে) */
+        .user-section-title { margin-top: 40px; margin-bottom: 20px; color: var(--accent-cyan); }
+        
+        .user-card {
+            background: #161b26;
+            border: 1px solid var(--accent-cyan);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
+
+        .checker-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .checker-item {
+            background: #0f141e;
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent-cyan); }
+
+        @media (max-width: 480px) { .checker-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>Master Admin Panel V1</h1>
-        <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 30px;">
+        <h1>MASTER ADMIN V2</h1>
+
+        <div class="control-card">
+            <div class="card-header"><i class="fas fa-power-off"></i> System Status</div>
+            <div class="btn-row">
+                <button class="btn btn-on" onclick="updateGlobal({isSiteActive: true})"><i class="fas fa-check-circle"></i> SITE ON</button>
+                <button class="btn btn-off" onclick="updateGlobal({isSiteActive: false})"><i class="fas fa-times-circle"></i> SITE OFF</button>
+            </div>
+        </div>
+
+        <div class="control-card">
+            <div class="card-header"><i class="fas fa-crown"></i> Premium Access</div>
+            <div class="btn-row">
+                <button class="btn btn-on" onclick="updateGlobal({isPremiumMode: true})">ENABLE PRO</button>
+                <button class="btn btn-off" onclick="updateGlobal({isPremiumMode: false})">DISABLE PRO</button>
+            </div>
+        </div>
+
+        <div class="control-card">
+            <div class="card-header"><i class="fas fa-money-bill-wave"></i> Payment & Price Control</div>
+            <input type="text" id="pPrice" placeholder="টাকার পরিমাণ লিখুন...">
+            <button class="btn btn-update" onclick="savePayment()">Update Price Info</button>
+        </div>
+
+        <h2 class="user-section-title"><i class="fas fa-users-cog"></i> User Custom Control</h2>
         
-        <div class="control-group">
-            <div class="control-header">
-                <span class="control-title"><i class="fas fa-toggle-on"></i> Site Status</span>
-            </div>
-            <div class="button-group">
-                <button class="btn-success" onclick="updateSettings({isSiteActive: true})">Site ON</button>
-                <button class="btn-danger" onclick="updateSettings({isSiteActive: false})">Site OFF</button>
-            </div>
+        <div id="userContainer">
+            <p style="text-align:center; opacity:0.5;">ডাটা লোড হচ্ছে...</p>
         </div>
-
-        <div class="control-group">
-            <div class="control-header">
-                <span class="control-title"><i class="fas fa-crown"></i> Premium Mode</span>
-            </div>
-            <div class="button-group">
-                <button class="btn-success" onclick="updateSettings({isPremiumMode: true})">Enable Premium</button>
-                <button class="btn-danger" onclick="updateSettings({isPremiumMode: false})">Disable Premium</button>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <div class="control-header">
-                <span class="control-title"><i class="fas fa-comment-dots"></i> Update Welcome Message</span>
-            </div>
-            <input type="text" id="welcomeMsg" placeholder="নতুন মেসেজ লিখুন...">
-            <button class="btn-primary" onclick="saveMessage()">Save Message</button>
-        </div>
-
-        <div class="control-group">
-            <div class="control-header">
-                <span class="control-title"><i class="fas fa-link"></i> Website Link Control</span>
-            </div>
-            <input type="url" id="siteLink" placeholder="সাইটের লিংক দিন (https://...)">
-            <button class="btn-primary" onclick="addLink()">Add Link</button>
-        </div>
-
-        <div class="control-group">
-            <div class="control-header">
-                <span class="control-title"><i class="fas fa-tasks"></i> Active Checkers (Select to show)</span>
-            </div>
-            <div class="checkers-grid">
-                <div class="checker-item"><input type="checkbox" id="checker1" value="checker1"> Checker 1</div>
-                <div class="checker-item"><input type="checkbox" id="checker2" value="checker2"> Checker 2</div>
-                <div class="checker-item"><input type="checkbox" id="checker3" value="checker3"> Checker 3</div>
-                <div class="checker-item"><input type="checkbox" id="checker4" value="checker4"> Checker 4</div>
-                <div class="checker-item"><input type="checkbox" id="checker5" value="checker5"> Checker 5</div>
-                <div class="checker-item"><input type="checkbox" id="checker6" value="checker6"> Checker 6</div>
-                <div class="checker-item"><input type="checkbox" id="checker7" value="checker7"> Checker 7</div>
-                <div class="checker-item"><input type="checkbox" id="checker8" value="checker8"> Checker 8</div>
-            </div>
-            <button class="btn-primary" onclick="saveCheckers()" style="margin-top: 10px;">Save Checkers</button>
-        </div>
-
     </div>
 
     <script>
-        async function updateSettings(data) {
-            const res = await fetch('/api/admin/update-settings', {
+        async function updateGlobal(data) {
+            await fetch('/api/admin/update-settings', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            const result = await res.json();
-            alert(result.message);
+            alert("সফলভাবে আপডেট হয়েছে!");
         }
 
-        function saveMessage() {
-            const msg = document.getElementById('welcomeMsg').value;
-            if (msg.trim()) {
-                updateSettings({loginWelcomeMessage: msg});
-            } else {
-                alert('মেসেজ খালি হতে পারবে না!');
-            }
+        async function fetchUsers() {
+            const res = await fetch('/api/admin/users');
+            const users = await res.json();
+            const container = document.getElementById('userContainer');
+            container.innerHTML = '';
+
+            users.forEach(user => {
+                const tools = ['FB-Check', 'Pass-Pro', 'IP-Scan', 'Mail-Pro', 'Dev-Scanner', 'Link-Safe', 'User-Hunt', 'Firewall'];
+                container.innerHTML += `
+                    <div class="user-card">
+                        <div style="font-weight:700; border-bottom:1px solid #2d3748; padding-bottom:10px; margin-bottom:10px;">
+                            ${user.name} (${user.email})
+                        </div>
+                        <div class="checker-grid">
+                            ${tools.map((tool, i) => `
+                                <div class="checker-item">
+                                    <label>${tool}</label>
+                                    <input type="checkbox" id="tool-${user._id}-${i}" ${user.permissions?.activeCheckers?.includes(tool) ? 'checked' : ''}>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-on" style="font-size:0.8rem;" onclick="manageUser('${user._id}', 'Approved')">Save Permissions</button>
+                            <button class="btn btn-off" style="font-size:0.8rem;" onclick="manageUser('${user._id}', 'Blocked')">Block User</button>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
-        function addLink() {
-            const link = document.getElementById('siteLink').value;
-            // এটি ডেভেলপ করার সময় অ্যাডমিন প্যানেল থেকে লিংক অ্যাড করার এপিআই ব্যবহার করবে
-            if (link.trim()) {
-                alert(`নতুন লিংক অ্যাড হয়েছে: ${link}`);
-            } else {
-                alert('লিংক দিন!');
+        async function manageUser(userId, status) {
+            const checkers = [];
+            const labels = ['FB-Check', 'Pass-Pro', 'IP-Scan', 'Mail-Pro', 'Dev-Scanner', 'Link-Safe', 'User-Hunt', 'Firewall'];
+            for(let i=0; i<8; i++) {
+                if(document.getElementById(`tool-${userId}-${i}`).checked) checkers.push(labels[i]);
             }
+            await fetch('/api/admin/manage-user', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ userId, status, checkers })
+            });
+            alert("ইউজার পারমিশন সেভ হয়েছে!");
+            fetchUsers();
         }
 
-        function saveCheckers() {
-            let activeCheckers = [];
-            for (let i = 1; i <= 8; i++) {
-                if (document.getElementById(`checker${i}`).checked) {
-                    activeCheckers.push(`checker${i}`);
-                }
-            }
-            updateSettings({activeCheckers: activeCheckers});
-            alert('চেকার সেটিংস সেভ হয়েছে!');
-        }
+        window.onload = fetchUsers;
     </script>
 </body>
-          </html>
+</html>
