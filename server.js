@@ -112,6 +112,118 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ইউজারের নিজস্ব প্রোফাইল ও পারমিশন দেখা
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const path = require('path');
+const bcrypt = require('bcryptjs');
+const requestIp = require('request-ip'); 
+const useragent = require('express-useragent'); 
+const compression = require('compression');
+const cookieParser = require('cookie-parser');
+require('dotenv').config();
+
+const app = express();
+
+// মডেল ইমপোর্ট
+const User = require('./User');
+const Settings = require('./Settings');
+
+// --- ১. প্রিমিয়াম প্রোটেকশন ও বট ব্লক সিস্টেম ---
+app.use(compression()); 
+app.use(cookieParser());
+app.use(helmet({ contentSecurityPolicy: false }));
+
+// সাইট স্ট্যাটাস চেক মিডলওয়্যার
+app.use(async (req, res, next) => {
+    try {
+        const settings = await Settings.findOne();
+        if (settings && !settings.isSiteActive) {
+            res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+        } else {
+            res.setHeader('X-Robots-Tag', 'index, follow');
+        }
+    } catch (e) {}
+    next();
+});
+
+app.use(cors());
+app.use(express.json());
+app.use(mongoSanitize());
+app.use(requestIp.mw());
+app.use(useragent.express());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// --- ২. ডাটাবেস কানেকশন (নতুন লিঙ্ক আপডেট করা হয়েছে) ---
+const mongoURI = process.env.MONGO_URI || "mongodb+srv://gourabadmin:gourab2006@cluster0.tyrqc0k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+mongoose.connect(mongoURI)
+.then(async () => {
+    console.log("✅ Database Connected Successfully!");
+    let settings = await Settings.findOne();
+    if (!settings) await Settings.create({ isSiteActive: true });
+})
+.catch(err => {
+    console.log("❌ MongoDB Connection Error:", err.message);
+});
+
+// --- ৩. আল্ট্রা এপিআই রাউটস ---
+
+// রেজিস্ট্রেশন
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { name, phone, email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const newUser = new User({ 
+            name, phone, email, password: hashedPassword,
+            status: 'Pending',
+            securityInfo: {
+                loginDevice: req.useragent.platform + " (" + req.useragent.browser + ")"
+            }
+        });
+        await newUser.save();
+        res.status(201).json({ message: "আবেদন সফল! অ্যাডমিনের অনুমতির অপেক্ষা করুন।" });
+    } catch (err) {
+        res.status(400).json({ error: "রেজিস্ট্রেশন ব্যর্থ! ইমেইল চেক করুন।" });
+    }
+});
+
+// লগইন লজিক
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) return res.status(400).json({ error: "ইউজার পাওয়া যায়নি!" });
+        
+        if (user.status === 'Blocked') return res.status(403).json({ error: "Your account is permanently blocked!" });
+        if (user.status === 'Pending') return res.status(403).json({ 
+            error: "অ্যাকাউন্টটি রিভিউতে আছে।",
+            redirect: "/pending.html" 
+        });
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ error: "ভুল পাসওয়ার্ড!" });
+
+        // লগইন ডিভাইস আপডেট
+        user.securityInfo.lastLoginDate = new Date();
+        user.securityInfo.loginDevice = req.useragent.platform + " - " + req.useragent.os;
+        await user.save();
+
+        const settings = await Settings.findOne();
+        res.status(200).json({ 
+            message: settings?.loginWelcomeMessage || "Welcome to Gourab Panel",
+            userId: user._id,
+            redirect: user.role === 'admin' ? "/admin-control.html" : "/dashboard.html"
+        });
+    } catch (err) {
+        res.status(500).json({ error: "সার্ভারে সমস্যা!" });
+    }
+});
+
+// ইউজারের নিজস্ব প্রোফাইল ও পারমিশন দেখা
 app.get('/api/user/me/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select('-password');
@@ -122,7 +234,7 @@ app.get('/api/user/me/:id', async (req, res) => {
     }
 });
 
-// অ্যাডমিন রাউটগুলো আগের মতোই থাকবে...
+// অ্যাডমিন রাউটগুলো
 app.get('/api/admin/users', async (req, res) => {
     try {
         const users = await User.find({ role: { $ne: 'admin' } });
@@ -159,7 +271,7 @@ app.post('/api/admin/update-settings', async (req, res) => {
     }
 });
 
-// ক্যাচ-অল রাউট: অন্য কোনো ইউআরএল না মিললে লগইন পেজ দেখাবে
+// ক্যাচ-অল রাউট
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
