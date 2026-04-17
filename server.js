@@ -16,23 +16,25 @@ app.use(helmet({
 app.use(cors());
 app.use(express.json());
 app.use(mongoSanitize());
-app.use(express.static('public'));
+
+// static folder define (খুবই জরুরি)
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Rate Limiting
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.use('/api/', limiter);
 
-// MongoDB Connection
+// MongoDB Connection (সরাসরি আপনার ডাটাবেস লিংকটি বসিয়ে দেওয়া হলো)
 const mongoURI = "mongodb+srv://gourabadmin:gourab2006@cluster0.xiyfnuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose.connect(mongoURI)
     .then(() => console.log("✅ Gourab's Database Connected!"))
     .catch(err => console.log("❌ DB Connection Error: ", err));
 
-// Routes
-// নিশ্চিত করুন আপনার 'routes' ফোল্ডারের ভেতর auth.js এবং admin.js ফাইল আছে
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/admin', require('./routes/admin'));
+// Routes (নিশ্চিত করুন আপনার ফাইল স্ট্রাকচার অনুযায়ী এই পাথ ঠিক আছে)
+// যদি আপনার আলাদা routes ফোল্ডার না থাকে, তবে এই লাইনগুলো পরে যোগ করা যাবে।
+// app.use('/api/auth', require('./routes/auth'));
+// app.use('/api/admin', require('./routes/admin'));
 
 // Default Route for UI
 app.get('*', (req, res) => {
