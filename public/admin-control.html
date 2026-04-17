@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourab Master Control V1</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #111827; /* Dark grayish-blue */
+            --card-bg: rgba(255, 255, 255, 0.08); /* Transparent with opacity */
+            --text-color: #f3f4f6; /* Light gray */
+            --accent-color: #06b6d4; /* Cyan/Teal */
+            --success-color: #22c55e; /* Green */
+            --danger-color: #ef4444; /* Red */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .btn-success { background: var(--success-color); }
+        .btn-danger { background: var(--danger-color); }
+        .btn-primary { background: var(--accent-color); color: #000; }
+
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* Input Styles */
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+        }
+
+        /* Checkbox Styles */
+        .checkers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .checker-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            h1 { font-size: 1.5rem; }
+            .button-group { flex-direction: column; }
+            .checkers-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Master Admin Panel V1</h1>
+        <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 30px;">
+        
+        <div class="control-group">
+            <div class="control-header">
+                <span class="control-title"><i class="fas fa-toggle-on"></i> Site Status</span>
+            </div>
+            <div class="button-group">
+                <button class="btn-success" onclick="updateSettings({isSiteActive: true})">Site ON</button>
+                <button class="btn-danger" onclick="updateSettings({isSiteActive: false})">Site OFF</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="control-header">
+                <span class="control-title"><i class="fas fa-crown"></i> Premium Mode</span>
+            </div>
+            <div class="button-group">
+                <button class="btn-success" onclick="updateSettings({isPremiumMode: true})">Enable Premium</button>
+                <button class="btn-danger" onclick="updateSettings({isPremiumMode: false})">Disable Premium</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="control-header">
+                <span class="control-title"><i class="fas fa-comment-dots"></i> Update Welcome Message</span>
+            </div>
+            <input type="text" id="welcomeMsg" placeholder="নতুন মেসেজ লিখুন...">
+            <button class="btn-primary" onclick="saveMessage()">Save Message</button>
+        </div>
+
+        <div class="control-group">
+            <div class="control-header">
+                <span class="control-title"><i class="fas fa-link"></i> Website Link Control</span>
+            </div>
+            <input type="url" id="siteLink" placeholder="সাইটের লিংক দিন (https://...)">
+            <button class="btn-primary" onclick="addLink()">Add Link</button>
+        </div>
+
+        <div class="control-group">
+            <div class="control-header">
+                <span class="control-title"><i class="fas fa-tasks"></i> Active Checkers (Select to show)</span>
+            </div>
+            <div class="checkers-grid">
+                <div class="checker-item"><input type="checkbox" id="checker1" value="checker1"> Checker 1</div>
+                <div class="checker-item"><input type="checkbox" id="checker2" value="checker2"> Checker 2</div>
+                <div class="checker-item"><input type="checkbox" id="checker3" value="checker3"> Checker 3</div>
+                <div class="checker-item"><input type="checkbox" id="checker4" value="checker4"> Checker 4</div>
+                <div class="checker-item"><input type="checkbox" id="checker5" value="checker5"> Checker 5</div>
+                <div class="checker-item"><input type="checkbox" id="checker6" value="checker6"> Checker 6</div>
+                <div class="checker-item"><input type="checkbox" id="checker7" value="checker7"> Checker 7</div>
+                <div class="checker-item"><input type="checkbox" id="checker8" value="checker8"> Checker 8</div>
+            </div>
+            <button class="btn-primary" onclick="saveCheckers()" style="margin-top: 10px;">Save Checkers</button>
+        </div>
+
+    </div>
+
+    <script>
+        async function updateSettings(data) {
+            const res = await fetch('/api/admin/update-settings', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        }
+
+        function saveMessage() {
+            const msg = document.getElementById('welcomeMsg').value;
+            if (msg.trim()) {
+                updateSettings({loginWelcomeMessage: msg});
+            } else {
+                alert('মেসেজ খালি হতে পারবে না!');
+            }
+        }
+
+        function addLink() {
+            const link = document.getElementById('siteLink').value;
+            // এটি ডেভেলপ করার সময় অ্যাডমিন প্যানেল থেকে লিংক অ্যাড করার এপিআই ব্যবহার করবে
+            if (link.trim()) {
+                alert(`নতুন লিংক অ্যাড হয়েছে: ${link}`);
+            } else {
+                alert('লিংক দিন!');
+            }
+        }
+
+        function saveCheckers() {
+            let activeCheckers = [];
+            for (let i = 1; i <= 8; i++) {
+                if (document.getElementById(`checker${i}`).checked) {
+                    activeCheckers.push(`checker${i}`);
+                }
+            }
+            updateSettings({activeCheckers: activeCheckers});
+            alert('চেকার সেটিংস সেভ হয়েছে!');
+        }
+    </script>
+</body>
+          </html>
