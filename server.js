@@ -18,18 +18,20 @@ const User = require('./User');
 const Settings = require('./Settings');
 
 // --- ১. প্রিমিয়াম প্রোটেকশন ও বট ব্লক সিস্টেম ---
-app.use(compression()); // দ্রুত লোডিংয়ের জন্য
+app.use(compression()); 
 app.use(cookieParser());
 app.use(helmet({ contentSecurityPolicy: false }));
 
-// অ্যাডমিন চাইলে গুগল ইনডেক্সিং অফ/অন করার মিডলওয়্যার
+// সাইট স্ট্যাটাস চেক মিডলওয়্যার
 app.use(async (req, res, next) => {
-    const settings = await Settings.findOne();
-    if (settings && !settings.isSiteActive) {
-        res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
-    } else {
-        res.setHeader('X-Robots-Tag', 'index, follow');
-    }
+    try {
+        const settings = await Settings.findOne();
+        if (settings && !settings.isSiteActive) {
+            res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+        } else {
+            res.setHeader('X-Robots-Tag', 'index, follow');
+        }
+    } catch (e) {}
     next();
 });
 
@@ -58,7 +60,8 @@ app.post('/api/auth/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = new User({ 
             name, phone, email, password: hashedPassword,
-            status: 'Pending' // ডিফল্ট পেন্ডিং
+            status: 'Pending',
+            "securityInfo.loginDevice": req.useragent.platform + " (" + req.useragent.browser + ")"
         });
         await newUser.save();
         res.status(201).json({ message: "আবেদন সফল! অ্যাডমিনের অনুমতির অপেক্ষা করুন।" });
@@ -67,16 +70,14 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// লগইন লজিক (পেন্ডিং ও ব্লক কন্ট্রোল সহ)
+// লগইন লজিক
 app.post('/api/auth/login', async (req, res) => {
     try {
-        const settings = await Settings.findOne();
         const { email, password } = req.body;
         const user = await User.findOne({ email });
 
         if (!user) return res.status(400).json({ error: "ইউজার পাওয়া যায়নি!" });
         
-        // ১. অ্যাকাউন্ট স্ট্যাটাস চেক
         if (user.status === 'Blocked') return res.status(403).json({ error: "Your account is permanently blocked!" });
         if (user.status === 'Pending') return res.status(403).json({ 
             error: "অ্যাকাউন্টটি রিভিউতে আছে।",
@@ -86,17 +87,15 @@ app.post('/api/auth/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: "ভুল পাসওয়ার্ড!" });
 
-        // লগ সিস্টেম (আইপি ও ডিভাইস ট্র্যাকিং)
-        const log = {
-            user: user.email,
-            device: req.useragent.platform + " - " + req.useragent.os,
-            ip: req.clientIp,
-            time: new Date()
-        };
-        await Settings.updateOne({}, { $push: { systemLogs: { $each: [log], $slice: -50 } } });
+        // লগইন ডিভাইস ও আইপি আপডেট (আপনার Infinix Hot 50i ট্র্যাকিংয়ের জন্য)
+        user.securityInfo.lastLoginDate = new Date();
+        user.securityInfo.loginDevice = req.useragent.platform + " - " + req.useragent.os;
+        await user.save();
 
+        const settings = await Settings.findOne();
         res.status(200).json({ 
-            message: settings.loginWelcomeMessage,
+            message: settings.loginWelcomeMessage || "Welcome to Gourab Panel",
+            userId: user._id, // ফ্রন্টএন্ডে প্রোফাইল টানার জন্য
             redirect: user.role === 'admin' ? "/admin-control.html" : "/dashboard.html"
         });
     } catch (err) {
@@ -104,7 +103,42 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// ৮টি চেকার কন্ট্রোল ও সেটিংস API
+// ইউজারের নিজস্ব প্রোফাইল ও পারমিশন দেখা (Dashboard-এর জন্য)
+app.get('/api/user/me/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        res.json(user);
+    } catch (err) {
+        res.status(404).json({ error: "User not found" });
+    }
+});
+
+// অ্যাডমিন: সব ইউজার লিস্ট দেখা
+app.get('/api/admin/users', async (req, res) => {
+    try {
+        const users = await User.find({ role: { $ne: 'admin' } });
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: "ফেলড!" });
+    }
+});
+
+// অ্যাডমিন: ৮টি চেকার ও স্ট্যাটাস ম্যানেজ করা
+app.post('/api/admin/manage-user', async (req, res) => {
+    try {
+        const { userId, status, checkers } = req.body; 
+        // আপনার নতুন মডেলে activeCheckers আপডেট করা
+        await User.findByIdAndUpdate(userId, { 
+            status: status, 
+            "permissions.activeCheckers": checkers 
+        });
+        res.json({ message: "ইউজার পারমিশন আপডেট হয়েছে!" });
+    } catch (err) {
+        res.status(500).json({ error: "Update failed!" });
+    }
+});
+
+// সেটিংস API
 app.get('/api/admin/get-settings', async (req, res) => {
     const settings = await Settings.findOne();
     res.json(settings);
@@ -116,17 +150,6 @@ app.post('/api/admin/update-settings', async (req, res) => {
         res.status(200).json({ message: "সিস্টেম আপডেট সফল!" });
     } catch (err) {
         res.status(500).json({ error: "Update failed!" });
-    }
-});
-
-// ইউজার পারমিশন ম্যানেজমেন্ট (অ্যাডমিন অনলি)
-app.post('/api/admin/manage-user', async (req, res) => {
-    try {
-        const { userId, status, checkers } = req.body; // checkers হবে ৮টি টুলের অ্যারে
-        await User.findByIdAndUpdate(userId, { status, "permissions.activeCheckers": checkers });
-        res.json({ message: "ইউজার পারমিশন আপডেট হয়েছে!" });
-    } catch (err) {
-        res.json({ error: "Error updating user" });
     }
 });
 
