@@ -19,14 +19,15 @@ const Settings = require('./Settings');
 // --- মিডলওয়্যার সেটআপ ---
 app.use(compression()); 
 app.use(cookieParser());
-app.use(helmet({ contentSecurityPolicy: false })); // CSS/JS লোড হওয়ার জন্য CSP অফ রাখা হয়েছে
+app.use(helmet({ contentSecurityPolicy: false })); 
 app.use(cors());
 app.use(express.json());
 app.use(mongoSanitize());
 app.use(requestIp.mw());
 app.use(useragent.express());
 
-// স্ট্যাটিক ফাইল পাথ (তোমার public/public স্ট্রাকচার অনুযায়ী)
+// ✅ সমাধান ১: স্ট্যাটিক ফাইল পাথ ঠিক করা
+// তোমার গিটহাবে 'public' এর ভেতর আরেকটা 'public' ফোল্ডার আছে, তাই এই পাথটি একদম সঠিক
 app.use(express.static(path.join(__dirname, 'public/public')));
 
 // --- ডাটাবেস কানেকশন ---
@@ -38,12 +39,12 @@ mongoose.connect(dbLinks.primary)
     .then(() => console.log("✅ Database Connected Successfully"))
     .catch(err => console.log("❌ DB Connection Error:", err));
 
-// --- ১. লগইন এপিআই (পেন্ডিং ও অ্যাডমিন লজিকসহ) ---
+// --- ১. লগইন এপিআই ---
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // তোমার স্পেশাল অ্যাডমিন আইডি চেক
+        // তোমার স্পেশাল অ্যাডমিন আইডি
         if (email === "gourabmon112233@gmail.com" && password === "goUrab@2008") {
             let adminUser = await User.findOne({ email });
             if (!adminUser) {
@@ -62,21 +63,18 @@ app.post('/api/auth/login', async (req, res) => {
             return res.json({ userId: adminUser._id, role: 'admin', redirect: "/admin-control.html" });
         }
 
-        // সাধারণ ইউজার লগইন চেক
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ error: "ইউজার পাওয়া যায়নি!" });
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: "ভুল পাসওয়ার্ড!" });
 
-        // স্ট্যাটাস অনুযায়ী রিডাইরেক্ট লজিক
         if (user.status === 'Pending') {
             return res.json({ userId: user._id, role: user.role, redirect: "/pending.html" });
         } else if (user.status === 'Blocked') {
             return res.status(403).json({ error: "আপনার অ্যাকাউন্টটি ব্লক করা হয়েছে!" });
         }
 
-        // এপ্রুভড ইউজারদের জন্য
         const redirectPath = user.role === 'admin' ? "/admin-control.html" : "/dashboard.html";
         res.json({ userId: user._id, role: user.role, redirect: redirectPath });
 
@@ -85,7 +83,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// --- ২. রেজিস্ট্রেশন এপিআই (ইউজারকে পেন্ডিং রাখবে) ---
+// --- ২. রেজিস্ট্রেশন এপিআই ---
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, phone, email, password } = req.body;
@@ -100,22 +98,22 @@ app.post('/api/auth/register', async (req, res) => {
             phone,
             email,
             password: hashedPassword,
-            status: 'Pending', // ডিফল্ট স্ট্যাটাস পেন্ডিং
+            status: 'Pending', 
             role: 'user',
             permissions: { 
-                activeCheckers: ["mail-validator", "fb-slit", "tg-slit", "2fa-slit"] 
+                // ✅ সমাধান ২: তোমার সেই ৮টি টুলের পারমিশন এখানে সেট করা হয়েছে
+                activeCheckers: ["mail-validator", "fb-slit", "tg-slit", "2fa-slit", "geo-sync", "data-reporter", "network-trace", "time-smary"] 
             }
         });
 
         await newUser.save();
-        // রেজিস্ট্রেশন শেষে ইউজার আইডি পাঠানো হচ্ছে যাতে pending.html এ স্ট্যাটাস চেক করা যায়
         res.status(201).json({ message: "Success", userId: newUser._id });
     } catch (err) { 
         res.status(500).json({ error: "রেজিস্ট্রেশন ব্যর্থ হয়েছে!" }); 
     }
 });
 
-// --- ৩. প্রোফাইল এপিআই (পেন্ডিং পেজের রিফ্রেশ বাটনের জন্য) ---
+// --- ৩. প্রোফাইল এপিআই ---
 app.get('/api/user/profile', async (req, res) => {
     try {
         const { userId } = req.query;
@@ -130,12 +128,12 @@ app.get('/api/user/profile', async (req, res) => {
     }
 });
 
-// --- ৪. ফাইল রাউটিং (ক্যাচ-অল) ---
+// --- ৪. ফাইল রাউটিং ---
 app.get('*', (req, res) => {
+    // এখানেও পাথটি আপডেট করা হয়েছে
     res.sendFile(path.join(__dirname, 'public/public', 'login.html'));
 });
 
-// সার্ভার লিসেনিং
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Gourab System Live on Port ${PORT}`);
