@@ -5,142 +5,92 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
 const bcrypt = require('bcryptjs');
-const requestIp = require('request-ip'); 
-const useragent = require('express-useragent'); 
-const compression = require('compression');
-const cookieParser = require('cookie-parser');
 const fs = require('fs');
 require('dotenv').config();
 
-// ১. অ্যাডমিন মিডলওয়্যার ইম্পোর্ট
 const adminAuth = require('./middleware/adminAuth');
+const User = require('./User');
 
 const app = express();
 
-// ২. মডেল লোড
-const User = require('./User');
-
-// --- মিডলওয়্যার সেটআপ ---
-app.use(compression()); 
-app.use(cookieParser());
+// --- মিডলওয়্যার ---
 app.use(helmet({ contentSecurityPolicy: false })); 
 app.use(cors());
 app.use(express.json());
 app.use(mongoSanitize());
-app.use(requestIp.mw());
-app.use(useragent.express());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// --- ৩. অটোমেটিক ফাইল পাথ হ্যান্ডলিং (স্মার্ট ডিটেকশন) ---
-const publicPaths = [
-    path.join(__dirname, 'public', 'public'),
-    path.join(__dirname, 'public'),
-    path.join(__dirname)
-];
+// --- ডাটাবেস কানেকশন ---
+const dbUri = process.env.MONGODB_URI || "তোমার_কানেকশন_স্ট্রিং";
+mongoose.connect(dbUri).then(() => console.log("✅ DB Connected")).catch(err => console.log(err));
 
-publicPaths.forEach(p => {
-    if (fs.existsSync(p)) {
-        app.use(express.static(p));
+// --- ১. ইউজারের নিজের তথ্য এবং পারমিশন চেক করার এপিআই ---
+app.get('/api/user/me', async (req, res) => {
+    try {
+        // নোট: এখানে ক্লায়েন্ট সাইড থেকে হেডার বা কুলোর মাধ্যমে userId পাঠাতে হবে
+        const userId = req.headers['user-id']; 
+        if (!userId) return res.status(401).json({ error: "লগইন করুন" });
+
+        const user = await User.findById(userId).select('-password');
+        if (!user) return res.status(404).json({ error: "ইউজার নেই" });
+
+        // যদি অ্যাডমিন তাকে ব্লক করে দেয়, তবে সাথে সাথে এক্সেস বন্ধ
+        if (user.status !== 'approved' && user.role !== 'admin') {
+            return res.status(403).json({ error: "আপনার এক্সেস বন্ধ করা হয়েছে", status: user.status });
+        }
+
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: "সার্ভার এরর" });
     }
 });
 
-// --- ৪. ডাটাবেস কানেকশন ---
-const dbUri = process.env.MONGODB_URI || "mongodb+srv://gourabadmin:gourab2006@cluster0.tyrqc0k.mongodb.net/?retryWrites=true&w=majority";
-
-mongoose.connect(dbUri)
-    .then(() => console.log("✅ Database Connected Successfully"))
-    .catch(err => console.log("❌ DB Connection Error:", err));
-
-// --- ৫. লগইন এপিআই (পেন্ডিং ইউজারদের আটকানোর জন্য) ---
+// --- ২. লগইন এপিআই ---
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-
         const user = await User.findOne({ email });
+
         if (!user) return res.status(400).json({ error: "ইউজার পাওয়া যায়নি!" });
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: "ভুল পাসওয়ার্ড!" });
 
-        // যদি ইউজার পেন্ডিং থাকে তবে তাকে পেন্ডিং পেজে পাঠানো হবে
+        // স্ট্যাটাস চেক
         if (user.status === 'Pending') {
-            return res.json({ userId: user._id, role: user.role, redirect: "/pending.html" });
-        } else if (user.status === 'Blocked') {
-            return res.status(403).json({ error: "আপনার অ্যাকাউন্টটি ব্লক করা হয়েছে!" });
+            return res.json({ userId: user._id, status: 'Pending', redirect: "/pending.html" });
+        } else if (user.status === 'blocked') {
+            return res.status(403).json({ error: "আপনাকে ব্লক করা হয়েছে!" });
         }
 
-        // অ্যাডমিন নাকি ইউজার সেই অনুযায়ী রিডাইরেক্ট
         const redirectPath = (user.role === 'admin') ? "/admin-control.html" : "/dashboard.html";
-        
-        res.json({ 
-            userId: user._id, 
-            role: user.role, 
-            redirect: redirectPath 
-        });
-
+        res.json({ userId: user._id, role: user.role, status: user.status, redirect: redirectPath });
     } catch (err) {
         res.status(500).json({ error: "সার্ভার এরর!" });
     }
 });
 
-// --- ৬. রেজিস্ট্রেশন এপিআই (ডিফল্ট পেন্ডিং থাকবে) ---
-app.post('/api/auth/register', async (req, res) => {
-    try {
-        const { name, phone, email, password } = req.body;
-        const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ error: "ইমেইলটি আগে থেকেই আছে!" });
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-        const newUser = new User({ 
-            name, phone, email, password: hashedPassword,
-            status: 'Pending', // নতুন ইউজাররা সরাসরি ঢুকতে পারবে না
-            role: 'user',
-            permissions: { activeCheckers: [] } // শুরুতে কোনো টুলস থাকবে না
-        });
-
-        await newUser.save();
-        res.status(201).json({ message: "Success", userId: newUser._id });
-    } catch (err) { 
-        res.status(500).json({ error: "রেজিস্ট্রেশন ব্যর্থ!" }); 
-    }
-});
-
-// --- ৭. অ্যাডমিন এপিআই ---
-app.get('/api/admin/users', adminAuth, async (req, res) => {
-    try {
-        const users = await User.find().select('-password');
-        res.json(users);
-    } catch (err) {
-        res.status(500).json({ error: "ইউজার লোড ব্যর্থ!" });
-    }
-});
-
+// --- ৩. অ্যাডমিন কন্ট্রোল (ইউজার ম্যানেজমেন্ট) ---
 app.post('/api/admin/manage-user', adminAuth, async (req, res) => {
     try {
-        const { userId, status, checkers } = req.body;
-        await User.findByIdAndUpdate(userId, { status, 'permissions.activeCheckers': checkers });
-        res.json({ message: "আপডেট সফল হয়েছে!" });
+        const { userId, status, permissions } = req.body; 
+        // permissions হবে একটি অ্যারে যেমন: ["2fa-slit", "fb-check"]
+        
+        await User.findByIdAndUpdate(userId, { 
+            status: status, // 'approved', 'blocked', 'Pending'
+            permissions: permissions 
+        });
+        
+        res.json({ message: "ইউজার আপডেট সফল!" });
     } catch (err) {
         res.status(500).json({ error: "আপডেট ব্যর্থ!" });
     }
 });
 
-// --- ৮. ফাইল রাউটিং (এরর ফিক্স) ---
+// বাকি সব রাউট এবং সার্ভার লিসেনিং...
 app.get('*', (req, res) => {
-    const checkFiles = [
-        path.join(__dirname, 'public', 'index.html'),
-        path.join(__dirname, 'public', 'public', 'index.html'),
-        path.join(__dirname, 'index.html')
-    ];
-
-    for (const file of checkFiles) {
-        if (fs.existsSync(file)) {
-            return res.sendFile(file);
-        }
-    }
-    res.status(404).send("মেইন ফাইল পাওয়া যায়নি। গিটহাবের public ফোল্ডার চেক করো।");
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Gourab System Live on Port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Live on ${PORT}`));
