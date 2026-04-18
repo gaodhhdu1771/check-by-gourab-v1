@@ -1,29 +1,11 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-    // --- ১. কোর আইডেন্টিটি ---
-    name: { 
-        type: String, 
-        required: true, 
-        trim: true 
-    },
-    phone: { 
-        type: String, 
-        required: true,
-        unique: true 
-    },
-    email: { 
-        type: String, 
-        required: true, 
-        unique: true, 
-        lowercase: true 
-    },
-    password: { 
-        type: String, 
-        required: true 
-    },
+    name: { type: String, required: true, trim: true },
+    phone: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password: { type: String, required: true },
     
-    // --- ২. অ্যাডমিন কন্ট্রোল সিস্টেম ---
     role: { 
         type: String, 
         enum: ['user', 'manager', 'admin'], 
@@ -31,71 +13,42 @@ const UserSchema = new mongoose.Schema({
     },
     status: { 
         type: String, 
-        enum: ['Pending', 'Approved', 'Blocked'], 
+        enum: ['Pending', 'Approved', 'Blocked'], // 'Approved' ই সার্ভারে ব্যবহৃত হচ্ছে
         default: 'Pending' 
     },
 
-    // --- ৩. ডাইনামিক ড্যাশবোর্ড ও টুল কন্ট্রোল ---
-    // শুরুতে সবাই সব পাবে (true), অ্যাডমিন চাইলে অফ করতে পারবে
     permissions: {
-        canViewDashboard: { 
-            type: Boolean, 
-            default: true 
-        }, 
-        fullToolAccess: { 
-            type: Boolean, 
-            default: true 
-        },
+        canViewDashboard: { type: Boolean, default: true }, 
         activeCheckers: { 
             type: [String], 
-            default: ["Tool1", "Tool2", "Tool3", "Tool4", "Tool5", "Tool6", "Tool7", "Tool8"] 
-        },
-        restrictedTools: { 
-            type: [String], 
-            default: [] 
+            // ডিফল্টভাবে তোমার ৮টি টুলের আইডি এখানে সেট করা হলো
+            default: [
+                "mail-validator", "fb-slit", "tg-slit", "2fa-slit", 
+                "geo-sync", "data-reporter", "network-trace", "admin-control"
+            ] 
         }
     },
 
-    // --- ৪. প্রফেশনাল মেট্রিক্স (গুগল ফ্রেন্ডলি) ---
-    systemMetrics: {
-        lastEntry: { 
-            type: Date, 
-            default: Date.now 
-        },
-        clientEnvironment: { 
-            type: String, 
-            default: "Mobile-Client" 
-        }, 
-        accessNode: { 
-            type: String, 
-            default: "0.0.0.0" 
-        },
-        internalNote: { 
-            type: String, 
-            default: "" 
-        } 
+    securityInfo: { // server.js এর লজিকের সাথে মিল রেখে
+        lastLoginDate: { type: Date },
+        loginDevice: { type: String, default: "Unknown Device" }
     },
 
-    invitedBy: { 
-        type: String, 
-        default: "Direct" 
+    systemMetrics: {
+        lastEntry: { type: Date, default: Date.now },
+        accessNode: { type: String, default: "0.0.0.0" }
     },
-    createdAt: { 
-        type: Date, 
-        default: Date.now 
-    }
+
+    invitedBy: { type: String, default: "Direct" }
 }, {
     timestamps: true 
 });
 
-/**
- * স্মার্ট অটোমেশন:
- * অ্যাডমিন যদি কাউকে 'Blocked' করে দেয়, তবে তার ড্যাশবোর্ড এক্সেস অটো বন্ধ হয়ে যাবে।
- */
+// অটোমেশন: ব্লক হলে এক্সেস বন্ধ
 UserSchema.pre('save', function(next) {
     if (this.status === 'Blocked') {
         this.permissions.canViewDashboard = false;
-        this.permissions.fullToolAccess = false;
+        this.permissions.activeCheckers = [];
     }
     next();
 });
