@@ -17,7 +17,7 @@ const adminAuth = require('./middleware/adminAuth');
 
 const app = express();
 
-// ২. মডেল লোড
+// ২. মডেল লোড (নিশ্চিত করো User.js মেইন ফোল্ডারে আছে)
 const User = require('./User');
 
 // --- মিডলওয়্যার সেটআপ ---
@@ -30,8 +30,7 @@ app.use(mongoSanitize());
 app.use(requestIp.mw());
 app.use(useragent.express());
 
-// --- ৩. অটোমেটিক স্ট্যাটিক পাথ হ্যান্ডলার ---
-// তোমার গিটহাবে 'public' এর ভেতর আরেকটা 'public' আছে, তাই আমরা সব চেক করবো
+// --- ৩. স্ট্যাটিক ফাইল হ্যান্ডলিং (তোমার ডাবল public ফোল্ডার সাপোর্ট করবে) ---
 const paths = [
     path.join(__dirname, 'public', 'public'),
     path.join(__dirname, 'public'),
@@ -51,28 +50,10 @@ mongoose.connect(dbUri)
     .then(() => console.log("✅ Database Connected Successfully"))
     .catch(err => console.log("❌ DB Connection Error:", err));
 
-// --- ৫. লগইন এপিআই ---
+// --- ৫. লগইন এপিআই (সংশোধিত অ্যাডমিন রিডাইরেক্ট) ---
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        if (email === "gourabmon112233@gmail.com" && password === "goUrab@2008") {
-            let adminUser = await User.findOne({ email });
-            if (!adminUser) {
-                const hashedPassword = await bcrypt.hash(password, 12);
-                adminUser = new User({
-                    name: "Gourab Admin",
-                    phone: "01700000000",
-                    email: email,
-                    password: hashedPassword,
-                    status: 'Approved',
-                    role: 'admin',
-                    permissions: { activeCheckers: ["all"] }
-                });
-                await adminUser.save();
-            }
-            return res.json({ userId: adminUser._id, role: 'admin', redirect: "/admin-control.html" });
-        }
 
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ error: "ইউজার পাওয়া যায়নি!" });
@@ -86,8 +67,14 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(403).json({ error: "আপনার অ্যাকাউন্টটি ব্লক করা হয়েছে!" });
         }
 
-        const redirectPath = user.role === 'admin' ? "/admin-control.html" : "/dashboard.html";
-        res.json({ userId: user._id, role: user.role, redirect: redirectPath });
+        // গৌরব, এখানে রোল চেক করে সঠিক পেজে পাঠানো হচ্ছে
+        const redirectPath = (user.role === 'admin') ? "/admin-control.html" : "/dashboard.html";
+        
+        res.json({ 
+            userId: user._id, 
+            role: user.role, 
+            redirect: redirectPath 
+        });
 
     } catch (err) {
         res.status(500).json({ error: "সার্ভার এরর!" });
@@ -115,7 +102,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// --- ৭. অ্যাডমিন কন্ট্রোল এপিআই (adminAuth দিয়ে সুরক্ষিত) ---
+// --- ৭. অ্যাডমিন কন্ট্রোল এপিআই ---
 app.get('/api/admin/users', adminAuth, async (req, res) => {
     try {
         const users = await User.find().select('-password');
@@ -148,10 +135,9 @@ app.get('*', (req, res) => {
             return res.sendFile(file);
         }
     }
-    res.status(404).send("Gourab, index.html বা মেইন ফাইল পাওয়া যায়নি। গিটহাবের public ফোল্ডার চেক করো।");
+    res.status(404).send("Gourab, মেইন ফাইল পাওয়া যায়নি। গিটহাবের public ফোল্ডার চেক করো।");
 });
 
-// পোর্ট সেটআপ
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Gourab System Live on Port ${PORT}`);
