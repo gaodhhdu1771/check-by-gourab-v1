@@ -117,53 +117,216 @@
         window.onload = async () => {
             try {
                 const res = await fetch('/api/admin/get-settings');
-                const settings = await res.json();
-                
-                // রেজিস্ট্রেশন নোটিশ সেট করা
-                document.getElementById('adminWarning').innerText = settings.registerNotice || "নতুন অ্যাকাউন্ট তৈরি করতে সঠিক তথ্য দিন।";
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Register | Check by Gourab-v1</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --accent: #00d2ff;
+            --btn-grad: linear-gradient(45deg, #00d2ff, #3a7bd5);
+        }
 
-                // থিম সেট করা
-                if(settings.themeConfig?.loginTheme) {
-                    document.getElementById('bodyTheme').className = settings.themeConfig.loginTheme;
-                }
-            } catch (err) { 
-                document.getElementById('adminWarning').innerText = "গৌরব ভাইয়ের প্যানেলে স্বাগতম!";
-            }
-        };
+        body {
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #00d2ff);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
 
-        // ২. রেজিস্ট্রেশন হ্যান্ডলার
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .register-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 35px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .register-card h2 {
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        #adminWarning {
+            color: #bdc3c7;
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+            padding: 10px;
+            background: rgba(0, 210, 255, 0.05);
+            border-radius: 12px;
+            line-height: 1.5;
+        }
+
+        .input-group { position: relative; margin-bottom: 15px; }
+        .input-group i {
+            position: absolute;
+            left: 18px;
+            top: 15px;
+            color: var(--accent);
+            z-index: 10;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 15px !important;
+            padding: 14px 15px 14px 50px !important;
+            color: #fff !important;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2) !important;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 18px;
+            top: 15px;
+            cursor: pointer;
+            color: #777;
+            z-index: 10;
+        }
+
+        .btn-register {
+            background: var(--btn-grad);
+            border: none;
+            border-radius: 15px;
+            padding: 14px;
+            width: 100%;
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2);
+            transition: 0.4s;
+            margin-top: 10px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(0, 210, 255, 0.4);
+        }
+
+        .footer-text { margin-top: 20px; color: #aaa; font-size: 0.85rem; }
+        .footer-text a { color: var(--accent); text-decoration: none; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div class="register-card">
+        <i class="fas fa-user-plus fa-3x" style="color: var(--accent); margin-bottom: 15px;"></i>
+        <h2>REGISTER</h2>
+        
+        <div id="adminWarning">গৌরব ভাইয়ের প্যানেলে স্বাগতম! অ্যাকাউন্ট খুলে অপেক্ষা করুন।</div>
+        
+        <form id="registerForm">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="name" class="form-control" placeholder="আপনার পুরো নাম" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-phone"></i>
+                <input type="text" id="phone" class="form-control" placeholder="ফোন নাম্বার" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="email" class="form-control" placeholder="ইমেইল এড্রেস" required>
+            </div>
+            
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" class="form-control" placeholder="পাসওয়ার্ড" required>
+                <span class="toggle-password" onclick="togglePass()">
+                    <i class="fas fa-eye-slash" id="regEyeIcon"></i>
+                </span>
+            </div>
+
+            <button type="submit" class="btn-register">Create Account</button>
+        </form>
+
+        <div class="footer-text">
+            ইতিমধ্যেই অ্যাকাউন্ট আছে? <a href="login.html">লগইন করুন</a>
+        </div>
+    </div>
+
+    <script>
+        // ১. রেজিস্ট্রেশন হ্যান্ডলার
         document.getElementById("registerForm").addEventListener("submit", async function(e) {
             e.preventDefault();
-            const regBtn = document.getElementById('regBtn');
-            regBtn.innerText = "প্রসেসিং হচ্ছে...";
-            regBtn.disabled = true;
+            
+            alert("গৌরব ভাইয়ের এই সাইটে রেজিস্টার করার জন্য আপনাকে অনেক অনেক ধন্যবাদ 🙏\n\nসতর্কতা: এই সাইট থেকে কোনো তথ্য চুরির চেষ্টা করবেন না, করলে আইডি ব্লক করা হবে।");
 
-            const username = document.getElementById('username').value;
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
             const email = document.getElementById('email').value;
-            const password = document.getElementById('regPassword').value;
+            const password = document.getElementById('password').value;
 
             try {
                 const res = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
+                    body: JSON.stringify({ name, phone, email, password })
                 });
                 const data = await res.json();
                 
                 if (res.ok) {
-                    alert("গৌরব ভাইয়ের প্যানেলে আপনার রেজিস্ট্রেশন সফল! এখন লগইন করুন। 🙏");
-                    window.location.href = 'login.html';
+                    // পেন্ডিং পেজের জন্য ইউজারের আইডি লোকাল স্টোরেজে সেভ করা হলো
+                    localStorage.setItem('userId', data.userId);
+                    alert("রেজিস্ট্রেশন সফল! এখন আপনার তথ্য যাচাই করা হবে।");
+                    window.location.href = 'pending.html';
                 } else {
                     alert(data.error || "রেজিস্ট্রেশন ব্যর্থ হয়েছে!");
-                    regBtn.innerText = "অ্যাকাউন্ট তৈরি করুন";
-                    regBtn.disabled = false;
                 }
             } catch (err) {
                 alert("সার্ভার কানেকশন এরর!");
-                regBtn.innerText = "অ্যাকাউন্ট তৈরি করুন";
-                regBtn.disabled = false;
             }
         });
+
+        function togglePass() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('regEyeIcon');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("fa-eye-slash", "fa-eye");
+            } else {
+                input.type = "password";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
+            }
+        }
     </script>
 </body>
 </html>
