@@ -1,26 +1,25 @@
-const User = require('./User'); // তোমার ফাইল স্ট্রাকচার অনুযায়ী পাথ ঠিক করা হয়েছে
+const User = require('../User'); // এক ধাপ পেছনে গিয়ে User.js ফাইলটি খুঁজবে
 
 const adminAuth = async (req, res, next) => {
     try {
-        // Headers (userid), Body বা Query থেকে আইডি নেওয়া
+        // রিকোয়েস্টের বিভিন্ন জায়গা থেকে ইউজার আইডি চেক
         const userId = req.headers['userid'] || req.headers['user-id'] || req.body.userId || req.query.userId;
 
         if (!userId) {
-            return res.status(401).json({ error: "অ্যাক্সেস ডিনাইড! ইউজার আইডি নেই।" });
+            return res.status(401).json({ error: "অ্যাক্সেস ডিনাইড! আইডি পাওয়া যায়নি।" });
         }
 
         const user = await User.findById(userId);
 
-        // ১. ডাটাবেজে রোল 'admin' হতে হবে 
-        // ২. অথবা তোমার পার্সোনাল ইমেইল হতে হবে
+        // অ্যাডমিন ইমেইল এবং রোলের ডাবল চেক
         if (user && (user.role === 'admin' || user.email === 'gourabmon112233@gmail.com')) {
-            next(); // গৌরব, তুমি ভেতরে যাওয়ার অনুমতি পেলে!
+            next(); // গৌরবকে অনুমতি দেওয়া হলো
         } else {
-            res.status(403).json({ error: "অননুমোদিত! এটি শুধুমাত্র গৌরবের জন্য সংরক্ষিত।" });
+            res.status(403).json({ error: "অননুমোদিত! এটি শুধুমাত্র গৌরবের কন্ট্রোল।" });
         }
     } catch (err) {
         console.error("Auth Error:", err);
-        res.status(500).json({ error: "সার্ভার অথোরাইজেশন এরর!" });
+        res.status(500).json({ error: "অথোরাইজেশন এরর!" });
     }
 };
 
