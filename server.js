@@ -28,9 +28,10 @@ app.use(requestIp.mw());
 app.use(useragent.express());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- ২. ডাটাবেস লজিক ---
+// --- ২. ডাটাবেস লজিক (Render Friendly) ---
 const dbLinks = {
-    primary: "mongodb+srv://gourabadmin:gourab2006@cluster0.tyrqc0k.mongodb.net/?retryWrites=true&w=majority",
+    // এখানে process.env.MONGODB_URI ব্যবহার করা হয়েছে যা Render এর Environment থেকে লিঙ্কটি নিবে
+    primary: process.env.MONGODB_URI || "mongodb+srv://gourabadmin:gourab2006@cluster0.tyrqc0k.mongodb.net/?retryWrites=true&w=majority",
     backup: "mongodb+srv://gourabadmin:gourab2006@cluster0.xiyfnuj.mongodb.net/?retryWrites=true&w=majority"
 };
 
@@ -53,10 +54,11 @@ connectToDB('primary').then(async () => {
 
 // --- ৩. এপিআই রাউটস ---
 
-// ইউজারের প্রোফাইল ডাটা (ড্যাশবোর্ড এটি কল করবে)
+// ইউজারের প্রোফাইল ডাটা
 app.get('/api/user/profile', async (req, res) => {
     try {
         const { userId } = req.query;
+        if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: "Invalid ID" });
         const user = await User.findById(userId).select('-password');
         if (!user) return res.status(404).json({ error: "User not found" });
         res.json(user);
@@ -93,23 +95,21 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// [ADMIN] ইউজার পারমিশন ও স্ট্যাটাস আপডেট
+// [ADMIN] ইউজার আপডেট
 app.post('/api/admin/update-user', async (req, res) => {
     try {
         const { targetUserId, status, activeCheckers } = req.body;
-        // activeCheckers এখানে তোমার ৮টি টুলের আইডি ধারণ করবে
-        const updatedUser = await User.findByIdAndUpdate(targetUserId, {
+        await User.findByIdAndUpdate(targetUserId, {
             status: status,
             'permissions.activeCheckers': activeCheckers
-        }, { new: true });
-
+        });
         res.json({ success: true, message: "User Updated!" });
     } catch (err) {
         res.status(500).json({ error: "Update Failed" });
     }
 });
 
-// [ADMIN] সব ইউজারের লিস্ট দেখা
+// [ADMIN] ইউজার লিস্ট
 app.get('/api/admin/users', async (req, res) => {
     try {
         const users = await User.find().select('-password');
@@ -128,25 +128,13 @@ app.post('/api/auth/register', async (req, res) => {
             name, phone, email, password: hashedPassword,
             status: 'Pending',
             role: 'user',
-            permissions: { activeCheckers: [] }, // ডিফল্টভাবে সব টুল অফ থাকবে
+            permissions: { activeCheckers: ["mail-validator", "fb-slit"] }, // ডিফল্ট কিছু টুল
             securityInfo: { loginDevice: req.useragent.platform }
         });
         await newUser.save();
-        res.status(201).json({ message: "আবেদন সফল! এডমিন এপ্রুভ করলে লগইন করতে পারবেন।" });
+        res.status(201).json({ message: "আবেদন সফল!" });
     } catch (err) {
-        res.status(400).json({ error: "রেজিস্ট্রেশন ব্যর্থ! হয়তো ইমেইলটি আগে ব্যবহার হয়েছে।" });
-    }
-});
-
-// ডাটাবেস পরিবর্তনের রাউট
-app.post('/api/admin/switch-db', async (req, res) => {
-    const { dbType } = req.body;
-    const success = await connectToDB(dbType);
-    if (success) {
-        await Settings.updateOne({}, { activeDB: dbType, dbStatus: 'Good' });
-        res.json({ message: `সফলভাবে ${dbType} ডাটাবেসে পরিবর্তন করা হয়েছে!` });
-    } else {
-        res.status(500).json({ error: "ডাটাবেস পরিবর্তন ব্যর্থ!" });
+        res.status(400).json({ error: "রেজিস্ট্রেশন ব্যর্থ!" });
     }
 });
 
@@ -155,6 +143,8 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+// --- ৪. পোর্ট ও হোস্ট কনফিগারেশন (খুবই জরুরি) ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Master Hybrid Active on ${PORT}`));
-
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Master Hybrid Active on Port ${PORT}`);
+});
