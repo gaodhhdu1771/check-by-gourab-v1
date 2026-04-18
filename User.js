@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-    // বেসিক ইনফরমেশন
+    // --- ১. কোর আইডেন্টিটি ---
     name: { 
         type: String, 
         required: true, 
@@ -9,7 +9,8 @@ const UserSchema = new mongoose.Schema({
     },
     phone: { 
         type: String, 
-        required: true 
+        required: true,
+        unique: true 
     },
     email: { 
         type: String, 
@@ -22,62 +23,54 @@ const UserSchema = new mongoose.Schema({
         required: true 
     },
     
-    // ডাইনামিক রোল সিস্টেম (অ্যাডমিন কন্ট্রোল)
+    // --- ২. অ্যাডমিন কন্ট্রোল সিস্টেম ---
     role: { 
         type: String, 
         enum: ['user', 'manager', 'admin'], 
         default: 'user' 
     },
-    
-    // অ্যাকাউন্ট এক্সেস স্ট্যাটাস (অ্যাডমিন প্যানেল থেকে কন্ট্রোল হবে)
     status: { 
         type: String, 
         enum: ['Pending', 'Approved', 'Blocked'], 
         default: 'Pending' 
     },
 
-    // মেম্বারশিপ লেভেল
-    isPremium: { 
-        type: Boolean, 
-        default: false 
-    },
-    membershipType: { 
-        type: String, 
-        default: "Free" 
-    }, // Basic, Silver, Gold
-
-    // অ্যাডভান্সড পারমিশন কন্ট্রোল (আপনার ৮টি চেকারের জন্য)
+    // --- ৩. ডাইনামিক ড্যাশবোর্ড ও টুল কন্ট্রোল ---
+    // শুরুতে সবাই সব পাবে (true), অ্যাডমিন চাইলে অফ করতে পারবে
     permissions: {
         canViewDashboard: { 
             type: Boolean, 
-            default: false 
+            default: true 
         }, 
-        viewAdminInfo: { 
+        fullToolAccess: { 
             type: Boolean, 
-            default: false 
+            default: true 
         },
-        // এখানে অ্যাডমিন প্যানেল থেকে পাঠানো চেকারগুলোর নাম সেভ হবে
         activeCheckers: { 
             type: [String], 
+            default: ["Tool1", "Tool2", "Tool3", "Tool4", "Tool5", "Tool6", "Tool7", "Tool8"] 
+        },
+        restrictedTools: { 
+            type: [String], 
             default: [] 
-        }, 
-        lastAccessedTool: { 
-            type: String, 
-            default: "None" 
         }
     },
 
-    // সিকিউরিটি ও ইনভাইটেশন ট্র্যাকিং
-    securityInfo: {
-        lastLoginDate: { 
-            type: Date 
+    // --- ৪. প্রফেশনাল মেট্রিক্স (গুগল ফ্রেন্ডলি) ---
+    systemMetrics: {
+        lastEntry: { 
+            type: Date, 
+            default: Date.now 
         },
-        // ইউজার লগইন করলে তার ডিভাইসের নাম এখানে থাকবে (যেমন: Infinix Hot 50i)
-        loginDevice: { 
+        clientEnvironment: { 
             type: String, 
-            default: "Unknown" 
+            default: "Mobile-Client" 
         }, 
-        accountNote: { 
+        accessNode: { 
+            type: String, 
+            default: "0.0.0.0" 
+        },
+        internalNote: { 
             type: String, 
             default: "" 
         } 
@@ -91,17 +84,18 @@ const UserSchema = new mongoose.Schema({
         type: Date, 
         default: Date.now 
     }
+}, {
+    timestamps: true 
 });
 
 /**
- * মিডলওয়্যার: ইউজারের স্ট্যাটাস অনুযায়ী ড্যাশবোর্ড এক্সেস অটো কন্ট্রোল।
- * যদি স্ট্যাটাস 'Approved' হয়, তবেই ড্যাশবোর্ড এক্সেস true হবে।
+ * স্মার্ট অটোমেশন:
+ * অ্যাডমিন যদি কাউকে 'Blocked' করে দেয়, তবে তার ড্যাশবোর্ড এক্সেস অটো বন্ধ হয়ে যাবে।
  */
 UserSchema.pre('save', function(next) {
-    if (this.status === 'Approved') {
-        this.permissions.canViewDashboard = true;
-    } else {
+    if (this.status === 'Blocked') {
         this.permissions.canViewDashboard = false;
+        this.permissions.fullToolAccess = false;
     }
     next();
 });
