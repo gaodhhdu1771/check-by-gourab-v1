@@ -12,11 +12,13 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 require('dotenv').config();
 
+// ✅ ১. অ্যাডমিন মিডলওয়্যার ইম্পোর্ট করা
+const adminAuth = require('./middleware/adminAuth');
+
 const app = express();
 
 // মডেল লোড করা
 const User = require('./User');
-// const Settings = require('./Settings'); // যদি Settings.js ফাইল থাকে তবে এটি আনকমেন্ট করো
 
 // --- মিডলওয়্যার সেটআপ ---
 app.use(compression()); 
@@ -50,7 +52,7 @@ app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // স্পেশাল অ্যাডমিন আইডি
+        // স্পেশাল অ্যাডমিন আইডি (তোমার দেওয়া ইমেইল ও পাসওয়ার্ড)
         if (email === "gourabmon112233@gmail.com" && password === "goUrab@2008") {
             let adminUser = await User.findOne({ email });
             if (!adminUser) {
@@ -62,7 +64,7 @@ app.post('/api/auth/login', async (req, res) => {
                     password: hashedPassword,
                     status: 'Approved',
                     role: 'admin',
-                    permissions: { activeCheckers: ["all"] }
+                    permissions: { activeCheckers: ["FB-Check", "Pass-Pro", "IP-Scan", "Mail-Pro", "Dev-Scanner", "Link-Safe", "User-Hunt", "Firewall"] }
                 });
                 await adminUser.save();
             }
@@ -101,7 +103,7 @@ app.post('/api/auth/register', async (req, res) => {
             name, phone, email, password: hashedPassword,
             status: 'Pending', role: 'user',
             permissions: { 
-                activeCheckers: ["mail-validator", "fb-slit", "tg-slit", "2fa-slit", "geo-sync", "data-reporter", "network-trace", "time-smary"] 
+                activeCheckers: [] // শুরুতে কোনো টুলস এক্সেস থাকবে না, অ্যাডমিন পরে দিবে
             }
         });
 
@@ -112,23 +114,42 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// --- ৩. ডাইরেক্ট অ্যাকাউন্ট ক্রিয়েটর (অ্যাডমিন প্যানেলের জন্য) ---
-app.post('/api/admin/create-account', async (req, res) => {
+// ✅ ৩. অ্যাডমিন প্যানেল এপিআই (adminAuth দিয়ে সুরক্ষিত) ---
+
+// সকল ইউজার লিস্ট দেখা
+app.get('/api/admin/users', adminAuth, async (req, res) => {
+    try {
+        const users = await User.find().select('-password');
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: "ইউজার লিস্ট লোড করা যায়নি!" });
+    }
+});
+
+// ইউজার স্ট্যাটাস ও টুলস আপডেট করা
+app.post('/api/admin/manage-user', adminAuth, async (req, res) => {
+    try {
+        const { userId, status, checkers } = req.body;
+        await User.findByIdAndUpdate(userId, { 
+            status: status, 
+            'permissions.activeCheckers': checkers 
+        });
+        res.json({ message: "ইউজার সফলভাবে আপডেট হয়েছে!" });
+    } catch (err) {
+        res.status(500).json({ error: "আপডেট ব্যর্থ হয়েছে!" });
+    }
+});
+
+// ডাইরেক্ট অ্যাকাউন্ট ক্রিয়েটর
+app.post('/api/admin/create-account', adminAuth, async (req, res) => {
     try {
         const { email, password, role } = req.body;
         const hashedPassword = await bcrypt.hash(password, 12);
-        
         const newUser = new User({
             name: role === 'admin' ? "Direct Admin" : "Direct User",
-            email: email,
-            password: hashedPassword,
-            role: role,
-            status: 'Approved', 
-            permissions: { 
-                activeCheckers: ["mail-validator", "fb-slit", "tg-slit", "2fa-slit", "geo-sync", "data-reporter", "network-trace", "time-smary"] 
-            }
+            email: email, password: hashedPassword, role: role, status: 'Approved', 
+            permissions: { activeCheckers: [] }
         });
-        
         await newUser.save();
         res.json({ message: "Account created successfully" });
     } catch (err) {
