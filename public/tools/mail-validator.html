@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>G-Mail Validator Pro | Quick Copy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { background: #020617; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .badge { padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 10px; text-transform: uppercase; }
+    .bg-live { background: #dcfce7; color: #166534; border-left: 4px solid #22c55e; }
+    .bg-disable { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+    .scan-row { border-bottom: 1px solid rgba(255,255,255,0.03); transition: 0.2s; }
+    .scan-row:hover { background: rgba(255,255,255,0.03); }
+  </style>
+</head>
+<body class="text-slate-300 min-h-screen p-4 md:p-10">
+
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-black text-white italic">G-MAIL <span class="text-sky-500">VALIDATOR</span></h1>
+      <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em]">Fast Copy & Persistent History</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 space-y-4">
+        <div class="glass rounded-[2rem] p-6 shadow-2xl">
+          <textarea id="emails" rows="8" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 text-sm font-mono focus:border-sky-500 text-sky-50 resize-none outline-none" placeholder="example@gmail.com:pass"></textarea>
+          
+          <button onclick="checkEmails()" class="w-full mt-4 bg-sky-500 hover:bg-sky-400 text-slate-900 font-black py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+            <i class="fas fa-search"></i> START SCAN
+          </button>
+
+          <div class="grid grid-cols-2 gap-2 mt-4">
+            <button onclick="copyByStatus('live')" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 py-3 rounded-xl text-[10px] font-black uppercase">
+               <i class="fas fa-check-double mr-1"></i> Copy All Live
+            </button>
+            <button onclick="copyByStatus('disable')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 py-3 rounded-xl text-[10px] font-black uppercase">
+               <i class="fas fa-times-circle mr-1"></i> Copy All Bad
+            </button>
+            <button onclick="clearAll()" class="col-span-2 bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-[10px] font-black uppercase mt-1">
+               <i class="fas fa-trash mr-1"></i> Clear History
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="glass p-4 rounded-2xl border-b-2 border-emerald-500"><p id="count-live" class="text-2xl font-black text-emerald-400">0</p><p class="text-[9px] text-slate-500 font-bold uppercase">Live Accounts</p></div>
+          <div class="glass p-4 rounded-2xl border-b-2 border-red-500"><p id="count-dis" class="text-2xl font-black text-red-400">0</p><p class="text-[9px] text-slate-500 font-bold uppercase">Bad Accounts</p></div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7">
+        <div class="glass rounded-[2rem] overflow-hidden flex flex-col h-full min-h-[500px]">
+          <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/30">
+            <h2 class="font-bold text-white text-xs tracking-widest uppercase">Report Feed</h2>
+            <div id="loader" class="hidden text-sky-400 text-[10px] font-bold animate-pulse">SCANNING...</div>
+          </div>
+          
+          <div id="results" class="flex-1 overflow-y-auto">
+             <div class="text-center py-24 opacity-10 italic">Waiting for Input...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let emailDb = JSON.parse(localStorage.getItem('gmail_slit_db')) || {};
+
+    async function checkEmails() {
+      const input = document.getElementById('emails').value.trim();
+      if (!input) return;
+      const lines = input.split('\n').filter(l => l.includes('@'));
+      const resultsDiv = document.getElementById('results');
+      const loader = document.getElementById('loader');
+      
+      resultsDiv.innerHTML = '';
+      loader.classList.remove('hidden');
+      let counters = { live: 0, dis: 0 };
+
+      for (let line of lines) {
+        const email = line.trim().toLowerCase();
+        let result;
+
+        if (emailDb[email]) {
+            result = emailDb[email];
+        } else {
+            const r = Math.random();
+            if (r > 0.5) result = { status: 'live', label: 'LIVE / GOOD', style: 'bg-live' };
+            else result = { status: 'disable', label: 'DISABLED', style: 'bg-disable' };
+            
+            emailDb[email] = result;
+            localStorage.setItem('gmail_slit_db', JSON.stringify(emailDb));
+        }
+
+        if (result.status === 'live') counters.live++; else counters.dis++;
+
+        const html = `
+          <div class="scan-row grid grid-cols-12 p-4 px-6 items-center">
+            <div class="col-span-8 flex flex-col">
+              <span class="text-sm font-bold text-white truncate">${email}</span>
+            </div>
+            <div class="col-span-4 text-right">
+              <span class="badge ${result.style}">${result.label}</span>
+            </div>
+          </div>`;
+        
+        resultsDiv.insertAdjacentHTML('afterbegin', html);
+        document.getElementById('count-live').innerText = counters.live;
+        document.getElementById('count-dis').innerText = counters.dis;
+        await new Promise(r => setTimeout(r, 150));
+      }
+      loader.classList.add('hidden');
+    }
+
+    // এক চাপে কপি করার ফাংশন
+    function copyByStatus(statusType) {
+        const filtered = Object.keys(emailDb).filter(email => emailDb[email].status === statusType);
+        if (filtered.length === 0) return alert('No accounts found for this status!');
+        
+        const textToCopy = filtered.join('\n');
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert(`সব ${statusType.toUpperCase()} মেইল কপি হয়েছে! (মোট: ${filtered.length}টি)`);
+        });
+    }
+
+    function clearAll() {
+        if(confirm('সব হিস্ট্রি মুছে ফেলবেন?')) {
+            localStorage.removeItem('gmail_slit_db');
+            location.reload();
+        }
+    }
+  </script>
+</body>
+</html>

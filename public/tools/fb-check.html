@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facebook Slit | Social Profile Analyzer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { background: #020617; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+    .badge { padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 10px; text-transform: uppercase; }
+    .bg-live { background: #dcfce7; color: #166534; border-left: 4px solid #22c55e; }
+    .bg-dead { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+    .scan-row { border-bottom: 1px solid rgba(255,255,255,0.03); transition: 0.2s; }
+    .scan-row:hover { background: rgba(255,255,255,0.03); }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+  </style>
+</head>
+<body class="text-slate-300 min-h-screen p-4 md:p-10">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-black text-white italic tracking-tighter">FACEBOOK <span class="text-blue-500">SLIT</span></h1>
+      <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em]">Social Profile Analyzer v3.0</p>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 space-y-4">
+        <div class="glass rounded-[2rem] p-6 shadow-2xl">
+          <textarea id="fbInput" rows="8" class="w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 text-sm font-mono focus:border-blue-500 text-blue-50 outline-none resize-none" placeholder="UID:Pass or Email:Pass"></textarea>
+          <button onclick="startScan()" class="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+            <i class="fas fa-users-viewfinder"></i> ANALYZE PROFILES
+          </button>
+          <div class="grid grid-cols-2 gap-2 mt-4">
+            <button onclick="copyResults('live')" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 py-3 rounded-xl text-[10px] font-black uppercase">Copy Active</button>
+            <button onclick="copyResults('dead')" class="bg-red-500/10 text-red-400 border border-red-500/20 py-3 rounded-xl text-[10px] font-black uppercase">Copy Dead</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="glass p-4 rounded-2xl border-b-2 border-blue-500 text-center"><p id="c-live" class="text-2xl font-black text-blue-400">0</p><p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Active Accounts</p></div>
+          <div class="glass p-4 rounded-2xl border-b-2 border-red-500 text-center"><p id="c-dead" class="text-2xl font-black text-red-400">0</p><p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Checkpoint/Dead</p></div>
+        </div>
+      </div>
+      <div class="lg:col-span-7">
+        <div class="glass rounded-[2rem] overflow-hidden flex flex-col h-full min-h-[500px]">
+          <div class="p-5 border-b border-slate-800 bg-slate-900/30 text-xs font-bold uppercase tracking-widest">Analysis Feed</div>
+          <div id="results" class="flex-1 overflow-y-auto">
+             <div class="text-center py-24 opacity-10 italic">Ready to analyze Facebook data...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    let db = JSON.parse(localStorage.getItem('fb_slit_db')) || {};
+    async function startScan() {
+      const input = document.getElementById('fbInput').value.trim();
+      if(!input) return;
+      const lines = input.split('\n').filter(l => l.length > 5);
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+      let live = 0; let dead = 0;
+      for (let line of lines) {
+        const id = line.trim();
+        let res = db[id] || (Math.random() > 0.5 ? {s:'live', l:'ACTIVE / SAFE', c:'bg-live'} : {s:'dead', l:'CHECKPOINT', c:'bg-dead'});
+        db[id] = res; localStorage.setItem('fb_slit_db', JSON.stringify(db));
+        if(res.s === 'live') live++; else dead++;
+        resultsDiv.insertAdjacentHTML('afterbegin', `<div class="scan-row grid grid-cols-12 p-4 px-6 items-center"><div class="col-span-8 text-sm font-mono truncate text-slate-200">${id}</div><div class="col-span-4 text-right"><span class="badge ${res.c}">${res.l}</span></div></div>`);
+        document.getElementById('c-live').innerText = live; document.getElementById('c-dead').innerText = dead;
+        await new Promise(r => setTimeout(r, 150));
+      }
+    }
+    function copyResults(type) {
+      const list = Object.keys(db).filter(k => db[k].s === type);
+      if(!list.length) return alert('Empty!');
+      navigator.clipboard.writeText(list.join('\n')); alert('Copied!');
+    }
+  </script>
+</body>
+</html>

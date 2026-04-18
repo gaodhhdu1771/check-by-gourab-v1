@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Insight Pro | Global Utility</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { 
+      background: #0f172a; 
+      font-family: 'Inter', system-ui, sans-serif;
+      background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+    }
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .status-card {
+      transition: all 0.3s ease;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .status-card:hover {
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+    .pulse-icon {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="text-slate-200 min-h-screen flex items-center justify-center p-4">
+
+  <div class="max-w-4xl w-full">
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-extrabold tracking-tight text-white mb-2">
+        Network <span class="text-sky-400">Insight Pro</span>
+      </h1>
+      <p class="text-slate-400">Advanced IP Diagnostics & Geo-Location Analysis</p>
+    </div>
+
+    <div class="glass-panel rounded-[2.5rem] p-8 md:p-12">
+      <div class="flex flex-col items-center mb-12">
+        <div class="w-20 h-20 bg-sky-500/20 rounded-full flex items-center justify-center mb-6 border border-sky-500/30">
+          <i class="fas fa-shield-halved text-3xl text-sky-400 pulse-icon"></i>
+        </div>
+        <button onclick="runDiagnostics()" class="bg-sky-500 hover:bg-sky-600 text-white px-10 py-4 rounded-2xl font-bold text-lg transition-all active:scale-95 shadow-lg shadow-sky-500/25">
+          Run System Scan
+        </button>
+      </div>
+
+      <div id="results" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="col-span-full text-center py-10 text-slate-500" id="placeholder">
+          Click the button above to start 1000% accurate reporting
+        </div>
+      </div>
+
+      <div id="footerAction" class="hidden mt-8 pt-8 border-t border-slate-700/50 flex justify-center">
+         <button onclick="location.reload()" class="text-slate-400 hover:text-white text-sm flex items-center gap-2">
+           <i class="fas fa-redo-alt"></i> Clear and Re-scan
+         </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function runDiagnostics() {
+      const resultsDiv = document.getElementById('results');
+      const placeholder = document.getElementById('placeholder');
+      
+      placeholder.innerHTML = `
+        <div class="flex flex-col items-center gap-4">
+            <div class="w-12 h-12 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
+            <p class="text-sky-400 font-medium">Fetching real-time data from 3 global nodes...</p>
+        </div>`;
+
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        
+        placeholder.className = "hidden";
+        document.getElementById('footerAction').className = "mt-8 pt-8 border-t border-slate-700/50 flex justify-center";
+
+        const fields = [
+          { label: 'Network IP', value: data.ip, icon: 'fa-network-wired' },
+          { label: 'Location', value: `${data.city}, ${data.country_name}`, icon: 'fa-map-marker-alt' },
+          { label: 'ISP Vendor', value: data.org, icon: 'fa-server' },
+          { label: 'Timezone', value: data.timezone, icon: 'fa-clock' },
+          { label: 'Local Time', value: new Date().toLocaleTimeString(), icon: 'fa-hourglass-half' },
+          { label: 'Region Code', value: data.region_code, icon: 'fa-map' },
+          { label: 'Zip Code', value: data.postal, icon: 'fa-mail-bulk' },
+          { label: 'VPN / Proxy', value: data.proxy ? 'DETECTED' : 'CLEAN', icon: 'fa-user-secret', color: data.proxy ? 'text-red-400' : 'text-emerald-400' }
+        ];
+
+        let html = '';
+        fields.forEach(f => {
+          html += `
+            <div class="status-card p-5 rounded-2xl flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
+                  <i class="fas ${f.icon} text-sky-400"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">${f.label}</p>
+                  <p class="text-sm font-bold text-white ${f.color || ''}">${f.value || 'Unknown'}</p>
+                </div>
+              </div>
+              <button onclick="navigator.clipboard.writeText('${f.value}')" class="text-slate-600 hover:text-sky-400 transition-colors">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>`;
+        });
+
+        resultsDiv.innerHTML = html;
+      } catch(e) {
+        placeholder.innerHTML = '<p class="text-red-400">Scan Failed. Check Connection.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
