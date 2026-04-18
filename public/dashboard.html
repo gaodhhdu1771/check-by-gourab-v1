@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Gourab Tech Panel</title>
+    <title>Dashboard | Gourab Core-V1</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -25,13 +25,9 @@
         .navbar { background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .nav-logo { font-size: 1.4rem; font-weight: 800; color: var(--accent-cyan); text-shadow: var(--neon-glow); }
 
-        .hero-section {
-            padding: 40px 20px;
-            text-align: center;
-        }
+        .hero-section { padding: 40px 20px; text-align: center; }
         .welcome-msg { font-size: 2rem; font-weight: 900; background: linear-gradient(to right, #00d2ff, #92fe9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* টুল কার্ড স্টাইল - ইউজাররা সবসময় দেখতে পারবে */
         .tool-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -42,31 +38,25 @@
             text-align: center;
             position: relative;
             cursor: pointer;
+            height: 100%;
         }
         .tool-card:hover { 
             border-color: var(--accent-cyan); 
             transform: translateY(-5px);
-            background: rgba(0, 210, 255, 0.05);
+            background: rgba(0, 210, 255, 0.1);
         }
         
-        .tool-icon { font-size: 2.2rem; color: var(--accent-cyan); margin-bottom: 10px; }
-        .tool-name { font-size: 0.85rem; font-weight: 700; color: #fff; }
+        .tool-icon { font-size: 2.5rem; color: var(--accent-cyan); margin-bottom: 12px; }
+        .tool-name { font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
 
-        /* স্ট্যাটাস ইন্ডিকেটর */
-        .status-dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
-        }
-        .dot-active { background: var(--btn-green); box-shadow: 0 0 10px var(--btn-green); }
-        .dot-off { background: var(--btn-red); box-shadow: 0 0 10px var(--btn-red); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .dot-active { background: var(--btn-green); box-shadow: 0 0 8px var(--btn-green); }
+        .dot-off { background: var(--btn-red); box-shadow: 0 0 8px var(--btn-red); }
 
-        /* সাইডবার */
         .offcanvas { background: #0a0e17 !important; border-right: 1px solid var(--accent-cyan); }
         .menu-item { padding: 15px 20px; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .menu-item:hover { background: rgba(0, 210, 255, 0.1); color: var(--accent-cyan); }
 
-        /* মোডাল */
         .modal-content { background: #0f121d; border: 2px solid var(--accent-cyan); border-radius: 25px; }
         .tg-link { background: linear-gradient(45deg, #0088cc, #00d2ff); color: white; border-radius: 50px; padding: 10px 25px; text-decoration: none; font-weight: bold; margin-top: 15px; display: inline-block; }
     </style>
@@ -88,11 +78,14 @@
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body p-0" id="sidebarItems"></div>
+        <div class="p-3 border-top border-secondary">
+            <a href="/logout" class="btn btn-outline-danger w-100 rounded-pill">Logout</a>
+        </div>
     </div>
 
     <div class="hero-section">
         <h1 class="welcome-msg" id="welcomeText">স্বাগতম!</h1>
-        <p class="opacity-75">আপনার পছন্দের টুলটি সিলেক্ট করে কাজ শুরু করুন।</p>
+        <p class="opacity-75">আপনার জন্য নির্ধারিত ৮টি প্রিমিয়াম টুল নিচে দেওয়া হলো।</p>
     </div>
 
     <div class="container pb-5">
@@ -120,63 +113,70 @@
             if (!userId) { window.location.href = '/login.html'; return; }
 
             try {
-                // সার্ভার থেকে ইউজারের পারমিশন ডাটা আনা হচ্ছে
+                // Backend API Call
                 const res = await fetch(`/api/user/profile?userId=${userId}`);
                 const data = await res.json();
                 
-                document.getElementById('welcomeText').innerText = `Hello, ${data.name}!`;
+                document.getElementById('welcomeText').innerText = `Hello, ${data.name || 'User'}!`;
                 
-                // এডমিন যে যে টুলগুলো এক্টিভ করেছে তার লিস্ট
+                // এডমিন প্যানেল থেকে আসা পারমিশন লিস্ট
                 const activeTools = data.permissions?.activeCheckers || [];
                 
                 const container = document.getElementById('checkersContainer');
                 const sidebar = document.getElementById('sidebarItems');
 
+                // তোমার প্রজেক্টের ৮টি টুলের সঠিক লিস্ট ও ফাইল নেম
                 const toolsList = [
-                    { id: 'FB-Check', name: 'FB-Pro Check', icon: 'fab fa-facebook' },
-                    { id: 'Pass-Pro', name: 'Pass-Strength', icon: 'fas fa-shield-virus' },
-                    { id: 'IP-Scan', name: 'IP-Tracker', icon: 'fas fa-network-wired' },
-                    { id: 'Mail-Pro', name: 'Mail-Pro', icon: 'fas fa-envelope-open-text' },
-                    { id: 'Dev-Scanner', name: 'Dev-Scanner', icon: 'fas fa-code-branch' },
-                    { id: 'Link-Safe', name: 'Link-Safe', icon: 'fas fa-link' },
-                    { id: 'User-Hunt', name: 'User-Hunt', icon: 'fas fa-search-dollar' },
-                    { id: 'Firewall', name: 'Firewall', icon: 'fas fa-user-shield' }
+                    { id: 'mail-validator', name: 'G-Mail Slit', icon: 'fas fa-envelope-open-text' },
+                    { id: 'fb-slit', name: 'Facebook Slit', icon: 'fab fa-facebook-square' },
+                    { id: 'tg-slit', name: 'TG Slit', icon: 'fab fa-telegram-plane' },
+                    { id: '2fa-slit', name: '2FA Slit', icon: 'fas fa-key' },
+                    { id: 'geo-sync', name: 'Geo-Sync Gen', icon: 'fas fa-id-card' },
+                    { id: 'data-reporter', name: 'Data Reporter', icon: 'fas fa-file-medical-alt' },
+                    { id: 'network-trace', name: 'Network Trace', icon: 'fas fa-network-wired' },
+                    { id: 'admin-control', name: 'Admin Center', icon: 'fas fa-user-shield' }
                 ];
 
+                container.innerHTML = '';
+                sidebar.innerHTML = '';
+
                 toolsList.forEach(tool => {
-                    const isLive = activeTools.includes(tool.id);
+                    // এডমিন যদি 'all' পারমিশন দেয় অথবা স্পেসিফিক আইডি থাকে
+                    const isLive = activeTools.includes(tool.id) || data.role === 'admin';
                     
-                    // ড্যাশবোর্ড কার্ড (সবসময় ভিজিবল থাকবে)
+                    // ড্যাশবোর্ড কার্ড
                     container.innerHTML += `
                         <div class="col-6 col-md-3">
-                            <div class="tool-card" onclick="handleToolClick('${tool.id}', ${isLive}, '${tool.name}')">
+                            <div class="tool-card shadow-sm" onclick="handleToolClick('${tool.id}', ${isLive}, '${tool.name}')">
                                 <div class="tool-icon"><i class="${tool.icon}"></i></div>
                                 <div class="tool-name">${tool.name}</div>
-                                <div style="font-size: 0.6rem; margin-top: 5px; opacity: 0.8;">
+                                <div style="font-size: 0.65rem;">
                                     <span class="status-dot ${isLive ? 'dot-active' : 'dot-off'}"></span>
-                                    ${isLive ? 'Online' : 'Offline'}
+                                    <span class="${isLive ? 'text-success' : 'text-danger'}">${isLive ? 'Active' : 'Locked'}</span>
                                 </div>
                             </div>
                         </div>`;
                     
-                    // সাইডবার
+                    // সাইডবার মেনু
                     sidebar.innerHTML += `
                         <a href="#" class="menu-item" onclick="handleToolClick('${tool.id}', ${isLive}, '${tool.name}')">
-                            <i class="${tool.icon} text-info"></i> ${tool.name}
+                            <i class="${tool.icon} ${isLive ? 'text-info' : 'text-secondary'}"></i> ${tool.name}
                         </a>`;
                 });
 
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error("Dashboard Init Error:", err);
+                // যদি API কাজ না করে তবে ডেমো দেখানোর জন্য (টেস্টিং এর জন্য)
+                // location.reload(); 
+            }
         }
 
-        // টুল হ্যান্ডলার: এডমিন অন রাখলে কাজ করবে, অফ করলে মোডাল দেখাবে
         function handleToolClick(id, isLive, name) {
             if (isLive) {
-                // টুল এক্টিভ থাকলে সেই লিংকে নিয়ে যাবে
-                window.location.href = `/tools/${id.toLowerCase()}.html`;
+                // public/tools/ ফোল্ডারে ফাইলগুলো থাকবে
+                window.location.href = `/tools/${id}.html`;
             } else {
-                // টুল ইন-এক্টিভ থাকলে মেসেজ দেখাবে
-                document.getElementById('accessMsg').innerHTML = `দুঃখিত <b>${name}</b> টুলটি বর্তমানে আপনার জন্য বন্ধ আছে। <br> এটি চালু করতে চাইলে এডমিনের সাথে যোগাযোগ করুন।`;
+                document.getElementById('accessMsg').innerHTML = `দুঃখিত <b>${name}</b> টুলটি বর্তমানে আপনার জন্য লক করা আছে। <br> এটি চালু করতে অ্যাডমিনের অনুমতি প্রয়োজন।`;
                 new bootstrap.Modal(document.getElementById('accessModal')).show();
             }
         }
@@ -185,4 +185,3 @@
     </script>
 </body>
 </html>
-
