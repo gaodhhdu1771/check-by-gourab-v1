@@ -6,136 +6,92 @@
     <title>Register | Check by Gourab-v1</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         :root {
             --accent: #00d2ff;
-            --btn-grad: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            --bg-dark: #0f0c29;
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
-        body {
-            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #00d2ff);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
+        /* থিম কন্ট্রোল - লগইন পেজের সাথে মিল রেখে */
+        body.dark-ocean { background: radial-gradient(circle, #1a1f35, #070b14); --accent: #00f2ff; }
+        body.neon-night { background: radial-gradient(circle, #2b0035, #0a0014); --accent: #ff00ff; }
+        body.gold-luxury { background: radial-gradient(circle, #2c1e01, #000000); --accent: #ffcc00; }
+        body.cyber-punk { background: #000; --accent: #39ff14; }
+
+        body { 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-family: 'Poppins', sans-serif;
             overflow: hidden;
+            margin: 0;
+            transition: 0.5s;
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .register-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 35px;
-            width: 90%;
-            max-width: 420px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4);
+        .auth-card { 
+            background: var(--glass); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 30px; 
+            padding: 35px; 
+            width: 90%; 
+            max-width: 420px; 
             text-align: center;
-            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.8s ease-out;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        .logo-area i { font-size: 3rem; color: var(--accent); margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--accent)); }
+        
+        .input-group { position: relative; margin-bottom: 15px; }
+        .input-group i { position: absolute; left: 18px; top: 15px; color: var(--accent); z-index: 10; }
+        
+        .form-control { 
+            background: rgba(255, 255, 255, 0.06) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.1) !important; 
+            border-radius: 15px !important; 
+            padding: 14px 14px 14px 50px !important; 
+            color: #fff !important; 
         }
 
-        .register-card h2 {
-            color: #fff;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
+        .form-control:focus { border-color: var(--accent) !important; box-shadow: 0 0 15px var(--accent); }
 
-        /* অ্যাডমিন কন্ট্রোলড মেসেজ স্টাইল */
-        #adminWarning {
-            color: #bdc3c7;
-            font-size: 0.85rem;
-            margin-bottom: 30px;
-            padding: 10px;
-            background: rgba(0, 210, 255, 0.05);
-            border-radius: 12px;
-            line-height: 1.5;
-        }
-
-        .input-group { position: relative; margin-bottom: 20px; }
-        .input-group i {
-            position: absolute;
-            left: 18px;
-            top: 15px;
-            color: var(--accent);
-            z-index: 10;
-            font-size: 1.1rem;
-        }
-
-        .form-control {
-            background: rgba(255, 255, 255, 0.06) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 15px !important;
-            padding: 14px 15px 14px 50px !important;
-            color: #fff !important;
-            transition: 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: var(--accent) !important;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2) !important;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 18px;
-            top: 15px;
-            cursor: pointer;
-            color: #777;
-            z-index: 10;
-        }
-
-        .btn-register {
-            background: var(--btn-grad);
-            border: none;
-            border-radius: 15px;
-            padding: 14px;
-            width: 100%;
-            color: #fff;
-            font-weight: 700;
+        .btn-auth { 
+            background: var(--accent); 
+            border: none; 
+            border-radius: 15px; 
+            padding: 14px; 
+            width: 100%; 
+            color: #000; 
+            font-weight: 800; 
             text-transform: uppercase;
-            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2);
-            transition: 0.4s;
+            box-shadow: 0 5px 15px var(--accent);
+            transition: 0.3s;
+            margin-top: 10px;
         }
 
-        .btn-register:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 25px rgba(0, 210, 255, 0.4);
-        }
-
-        .footer-text { margin-top: 20px; color: #aaa; font-size: 0.85rem; }
-        .footer-text a { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .btn-auth:hover { transform: translateY(-3px); opacity: 0.9; }
+        
+        #adminWarning { color: #ccc; margin-bottom: 20px; font-size: 0.85rem; font-weight: 300; }
+        .footer-text { margin-top: 20px; font-size: 0.85rem; color: #aaa; }
+        .footer-text a { color: var(--accent); text-decoration: none; font-weight: bold; }
     </style>
 </head>
-<body>
+<body class="dark-ocean" id="bodyTheme">
 
-    <div class="register-card">
-        <i class="fas fa-user-plus fa-3x" style="color: var(--accent); margin-bottom: 15px;"></i>
-        <h2>REGISTER</h2>
-        
-        <div id="adminWarning">Loading admin notice...</div>
+    <div class="auth-card">
+        <div class="logo-area"><i class="fas fa-user-plus"></i></div>
+        <h2 style="color: #fff; font-weight: 800; letter-spacing: 2px;">REGISTER</h2>
+        <p id="adminWarning">অপেক্ষা করুন...</p>
         
         <form id="registerForm">
             <div class="input-group">
                 <i class="fas fa-user"></i>
-                <input type="text" id="username" class="form-control" placeholder="আপনার নাম" required>
+                <input type="text" id="username" class="form-control" placeholder="আপনার পুরো নাম" required>
             </div>
 
             <div class="input-group">
@@ -145,29 +101,32 @@
             
             <div class="input-group">
                 <i class="fas fa-lock"></i>
-                <input type="password" id="regPassword" class="form-control" placeholder="পাসওয়ার্ড" required>
-                <span class="toggle-password" onclick="togglePass()">
-                    <i class="fas fa-eye-slash" id="regEyeIcon"></i>
-                </span>
+                <input type="password" id="regPassword" class="form-control" placeholder="পাসওয়ার্ড দিন" required>
             </div>
 
-            <button type="submit" class="btn-register">Create Account</button>
+            <button type="submit" class="btn-auth" id="regBtn">অ্যাকাউন্ট তৈরি করুন</button>
         </form>
-
+        
         <div class="footer-text">
             ইতিমধ্যেই অ্যাকাউন্ট আছে? <a href="login.html">লগইন করুন</a>
         </div>
     </div>
 
     <script>
-        // ১. অ্যাডমিন নোটিশ লোড করা (ডাইনামিক সিস্টেম)
+        // ১. অ্যাডমিন সেটিংস ও থিম লোড করা (লগইন পেজের মতো)
         window.onload = async () => {
             try {
                 const res = await fetch('/api/admin/get-settings');
                 const settings = await res.json();
-                // অ্যাডমিন যদি বিশেষ কোনো ওয়ার্নিং সেট করে থাকে তবে সেটি দেখাবে
-                document.getElementById('adminWarning').innerText = settings.registerNotice || "নতুন অ্যাকাউন্ট তৈরি করার জন্য নিচের তথ্যগুলো পূরণ করুন।";
-            } catch (err) {
+                
+                // রেজিস্ট্রেশন নোটিশ সেট করা
+                document.getElementById('adminWarning').innerText = settings.registerNotice || "নতুন অ্যাকাউন্ট তৈরি করতে সঠিক তথ্য দিন।";
+
+                // থিম সেট করা
+                if(settings.themeConfig?.loginTheme) {
+                    document.getElementById('bodyTheme').className = settings.themeConfig.loginTheme;
+                }
+            } catch (err) { 
                 document.getElementById('adminWarning').innerText = "গৌরব ভাইয়ের প্যানেলে স্বাগতম!";
             }
         };
@@ -175,9 +134,9 @@
         // ২. রেজিস্ট্রেশন হ্যান্ডলার
         document.getElementById("registerForm").addEventListener("submit", async function(e) {
             e.preventDefault();
-            
-            // আপনার স্পেশাল অ্যালার্ট (এটি অ্যাডমিন চাইলে কোড থেকেও বদলানো সম্ভব)
-            alert("গৌরব ভাইয়ের এই সাইটে রেজিস্টার করার জন্য আপনাকে অনেক অনেক ধন্যবাদ 🙏\n\nসতর্কতা: এই সাইট থেকে কোনো তথ্য চুরির চেষ্টা করবেন না, করলে আইডি ব্লক করা হবে।");
+            const regBtn = document.getElementById('regBtn');
+            regBtn.innerText = "প্রসেসিং হচ্ছে...";
+            regBtn.disabled = true;
 
             const username = document.getElementById('username').value;
             const email = document.getElementById('email').value;
@@ -192,27 +151,19 @@
                 const data = await res.json();
                 
                 if (res.ok) {
-                    alert("রেজিস্ট্রেশন সফল! এখন লগইন করুন।");
+                    alert("গৌরব ভাইয়ের প্যানেলে আপনার রেজিস্ট্রেশন সফল! এখন লগইন করুন। 🙏");
                     window.location.href = 'login.html';
                 } else {
-                    alert(data.error);
+                    alert(data.error || "রেজিস্ট্রেশন ব্যর্থ হয়েছে!");
+                    regBtn.innerText = "অ্যাকাউন্ট তৈরি করুন";
+                    regBtn.disabled = false;
                 }
             } catch (err) {
                 alert("সার্ভার কানেকশন এরর!");
+                regBtn.innerText = "অ্যাকাউন্ট তৈরি করুন";
+                regBtn.disabled = false;
             }
         });
-
-        function togglePass() {
-            const input = document.getElementById('regPassword');
-            const icon = document.getElementById('regEyeIcon');
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.replace("fa-eye-slash", "fa-eye");
-            } else {
-                input.type = "password";
-                icon.classList.replace("fa-eye", "fa-eye-slash");
-            }
-        }
     </script>
 </body>
 </html>
