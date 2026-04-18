@@ -16,7 +16,7 @@ const app = express();
 const User = require('./User');
 const Settings = require('./Settings');
 
-// --- মিডলওয়্যার ---
+// --- মিডলওয়্যার সেটআপ ---
 app.use(compression()); 
 app.use(cookieParser());
 app.use(helmet({ contentSecurityPolicy: false })); 
@@ -26,8 +26,7 @@ app.use(mongoSanitize());
 app.use(requestIp.mw());
 app.use(useragent.express());
 
-// ✅ সমাধান: ডবল পাবলিক ফোল্ডার পাথ ঠিক করা
-// তোমার গিটহাব অনুযায়ী: public -> public -> [files]
+// ✅ সমাধান ১: তোমার গিটহাবের public/public ফোল্ডার অনুযায়ী স্ট্যাটিক পাথ
 app.use(express.static(path.join(__dirname, 'public', 'public')));
 
 // --- ডাটাবেস কানেকশন ---
@@ -39,14 +38,12 @@ mongoose.connect(dbLinks.primary)
     .then(() => console.log("✅ Database Connected Successfully"))
     .catch(err => console.log("❌ DB Connection Error:", err));
 
-// --- এপিআই রাউটস ---
-
-// লগইন এপিআই
+// --- ১. লগইন এপিআই ---
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // অ্যাডমিন চেক
+        // স্পেশাল অ্যাডমিন আইডি (গৌরব)
         if (email === "gourabmon112233@gmail.com" && password === "goUrab@2008") {
             let adminUser = await User.findOne({ email });
             if (!adminUser) {
@@ -66,7 +63,7 @@ app.post('/api/auth/login', async (req, res) => {
         }
 
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ error: "ইউজার পাওয়া যায়নি!" });
+        if (!user) return res.status(400).json({ error: "ইউজার পাওয়া যায়নি! দয়া করে নতুন করে রেজিস্ট্রেশন করুন।" });
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: "ভুল পাসওয়ার্ড!" });
@@ -85,19 +82,25 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// রেজিস্ট্রেশন এপিআই
+// --- ২. রেজিস্ট্রেশন এপিআই ---
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, phone, email, password } = req.body;
+        
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ error: "এই ইমেইল দিয়ে অলরেডি অ্যাকাউন্ট আছে!" });
 
         const hashedPassword = await bcrypt.hash(password, 12);
+        
         const newUser = new User({ 
-            name, phone, email, password: hashedPassword,
-            status: 'Pending', role: 'user',
+            name,
+            phone,
+            email,
+            password: hashedPassword,
+            status: 'Pending', 
+            role: 'user',
             permissions: { 
-                // তোমার ৮টি টুলস লিস্ট করা হয়েছে
+                // তোমার সেই ৮টি টুলের নাম এখানে দেওয়া হয়েছে
                 activeCheckers: ["mail-validator", "fb-slit", "tg-slit", "2fa-slit", "geo-sync", "data-reporter", "network-trace", "time-smary"] 
             }
         });
@@ -109,23 +112,31 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// প্রোফাইল এপিআই
+// --- ৩. প্রোফাইল এপিআই ---
 app.get('/api/user/profile', async (req, res) => {
     try {
         const { userId } = req.query;
         if (!userId) return res.status(400).json({ error: "User ID required" });
+        
         const user = await User.findById(userId).select('-password');
         if (!user) return res.status(404).json({ error: "User not found" });
+        
         res.json(user);
     } catch (err) {
         res.status(500).send(err);
     }
 });
 
-// ✅ ফাইল রাউটিং ক্যাচ-অল (Solution for ENOENT error)
+// --- ৪. ফাইল রাউটিং (ক্যাচ-অল) ---
+// ✅ সমাধান ২: রেন্ডারে ENOENT এরর দূর করার জন্য নিখুঁত পাথ লজিক
 app.get('*', (req, res) => {
-    // এই পাথটি Render সার্ভারকে ঠিক জায়গায় নিয়ে যাবে
-    res.sendFile(path.join(__dirname, 'public', 'public', 'login.html'));
+    const mainFile = path.join(__dirname, 'public', 'public', 'login.html');
+    res.sendFile(mainFile, (err) => {
+        if (err) {
+            console.error("Path Error:", err);
+            res.status(404).send("মেইন ফাইল পাওয়া যায়নি। পাথ চেক করুন।");
+        }
+    });
 });
 
 // সার্ভার স্টার্ট
