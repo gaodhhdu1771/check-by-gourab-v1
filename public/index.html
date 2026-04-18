@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourab v3 | Access Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --accent: #00f2ff; --bg: #070b14; --glass: rgba(255, 255, 255, 0.05); }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+        
+        body { 
+            background: radial-gradient(circle at top right, #1a1f35, var(--bg)); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            min-height: 100vh; color: white; overflow: hidden; 
+        }
+
+        .site-title {
+            font-size: 2.2rem; font-weight: 900; color: var(--accent);
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+            margin-bottom: 20px; letter-spacing: 4px;
+        }
+
+        .auth-card {
+            background: var(--glass); padding: 30px; border-radius: 28px; width: 90%; max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(25px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6); position: relative;
+        }
+
+        .toggle-box { display: flex; background: rgba(0,0,0,0.5); border-radius: 15px; margin-bottom: 25px; padding: 5px; }
+        .toggle-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #888; cursor: pointer; font-weight: 700; transition: 0.4s; }
+        .toggle-btn.active { background: var(--accent); color: #000; border-radius: 10px; box-shadow: 0 0 15px rgba(0,242,255,0.4); }
+
+        .input-group { position: relative; margin-bottom: 15px; }
+        .input-group i:first-child { position: absolute; left: 15px; top: 15px; color: var(--accent); }
+        
+        /* পাসওয়ার্ড শো বাটন স্টাইল */
+        .toggle-password {
+            position: absolute; right: 15px; top: 15px; color: #888; cursor: pointer; transition: 0.3s;
+        }
+        .toggle-password:hover { color: var(--accent); }
+
+        input { width: 100%; padding: 12px 45px 12px 45px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--accent); }
+
+        .main-btn { width: 100%; padding: 15px; background: var(--accent); border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: #000; text-transform: uppercase; box-shadow: 0 10px 20px rgba(0,242,255,0.2); }
+
+        .auth-section { display: none; }
+        .active-section { display: block; animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ক্রেডিট টেক্সট */
+        .footer-credit {
+            margin-top: 20px; font-size: 0.75rem; color: rgba(255,255,255,0.4); letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="site-title">GOURAB V3</div>
+
+<div class="auth-card" id="mainCard">
+    <div id="navBox" class="toggle-box">
+        <button id="loginTab" class="toggle-btn active" onclick="showSection('login')">LOGIN</button>
+        <button id="registerTab" class="toggle-btn" onclick="showSection('register')">SIGN UP</button>
+    </div>
+
+    <div id="loginSection" class="auth-section active-section">
+        <form id="loginForm">
+            <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="lEmail" placeholder="Email Address" required></div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="lPass" placeholder="Password" required>
+                <i class="fas fa-eye toggle-password" onclick="togglePass('lPass', this)"></i>
+            </div>
+            <button type="submit" class="main-btn">Authorize</button>
+        </form>
+    </div>
+
+    <div id="registerSection" class="auth-section">
+        <form id="registerForm">
+            <div id="regInputs">
+                <div class="input-group"><i class="fas fa-user"></i><input type="text" id="rName" placeholder="Full Name" required></div>
+                <div class="input-group"><i class="fas fa-phone"></i><input type="text" id="rPhone" placeholder="Phone" required></div>
+                <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="rEmail" placeholder="Email Address" required></div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="rPass" placeholder="Password" required>
+                    <i class="fas fa-eye toggle-password" onclick="togglePass('rPass', this)"></i>
+                </div>
+                <button type="submit" class="main-btn">Create Profile</button>
+            </div>
+            <div id="regClosedMsg" style="display:none; text-align:center; color:#ff4d4d; padding:20px;">
+                Registration Closed by Admin.
+            </div>
+        </form>
+    </div>
+
+    <div id="pendingSection" class="auth-section" style="text-align: center;">
+        <div style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;"><i class="fas fa-user-clock"></i></div>
+        <h2 style="color:var(--accent)">Under Review</h2>
+        <p style="font-size: 0.8rem; color: #888; margin-bottom: 25px;">গৌরব, আপনার একাউন্টটি বর্তমানে পেন্ডিং আছে।</p>
+        <button onclick="checkStatus()" class="main-btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent);">Check Status</button>
+    </div>
+</div>
+
+<div class="footer-credit">Created by <b>Gourab</b></div>
+
+<script>
+    // পাসওয়ার্ড দেখানো বা লুকানোর ফাংশন
+    function togglePass(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
+    }
+
+    function showSection(section) {
+        document.querySelectorAll('.auth-section').forEach(s => s.classList.remove('active-section'));
+        document.getElementById(section + 'Section').classList.add('active-section');
+        if(section === 'pending') {
+            document.getElementById('navBox').style.display = 'none';
+        } else {
+            document.getElementById('navBox').style.display = 'flex';
+            document.getElementById('loginTab').classList.toggle('active', section === 'login');
+            document.getElementById('registerTab').classList.toggle('active', section === 'register');
+        }
+    }
+
+    // লগইন, রেজিস্ট্রেশন ও স্ট্যাটাস চেক লজিক আগের মতোই থাকবে...
+    document.getElementById('loginForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email: document.getElementById('lEmail').value, password: document.getElementById('lPass').value })
+        });
+        const data = await res.json();
+        if(res.ok) {
+            localStorage.setItem('userId', data.userId);
+            if(data.status === 'Pending') showSection('pending');
+            else window.location.href = 'dashboard.html';
+        } else { alert(data.error); }
+    };
+
+    document.getElementById('registerForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ name: document.getElementById('rName').value, phone: document.getElementById('rPhone').value, email: document.getElementById('rEmail').value, password: document.getElementById('rPass').value })
+        });
+        const data = await res.json();
+        if(res.ok) {
+            localStorage.setItem('userId', data.userId);
+            showSection('pending');
+        } else { alert(data.error); }
+    };
+
+    async function checkStatus() {
+        const userId = localStorage.getItem('userId');
+        const res = await fetch(`/api/user/profile?userId=${userId}`);
+        const user = await res.json();
+        if(user.status === 'Approved') window.location.href = 'dashboard.html';
+        else alert("Still Pending!");
+    }
+</script>
+
+</body>
+  </html>
