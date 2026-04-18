@@ -1,44 +1,23 @@
 {
   "name": "check-by-gourab-v1",
-  "version": "1.5.0",
-  "description": "Ultra Premium Technology Control Panel - Master Edition by Gourab",
+  "version": "1.0.0",
+  "description": "Premium Tool Panel",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "build": "echo 'Building high-performance assets...'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [
-    "security",
-    "dashboard",
-    "ultra-premium",
-    "gourab-master-v1",
-    "full-stack"
-  ],
-  "author": "Gourab",
-  "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2",
-    "mongoose": "^8.3.2",
-    "dotenv": "^16.4.5",
-    "cors": "^2.8.5",
-    "helmet": "^7.1.0",
-    "express-mongo-sanitize": "^2.2.0",
     "bcryptjs": "^2.4.3",
-    "request-ip": "^3.3.0",
-    "express-useragent": "^1.0.15",
     "compression": "^1.7.4",
-    "cookie-parser": "^1.4.6"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/MrGourab/check-by-gourab-v1"
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-useragent": "^1.0.1",
+    "helmet": "^6.0.1",
+    "mongoose": "^6.10.0",
+    "request-ip": "^3.3.0"
   }
 }
+
