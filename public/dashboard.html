@@ -3,112 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Gourab Tech</title>
+    <title>Dashboard | Gourab Tech Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-dark: #080b12;
             --accent-cyan: #00d2ff;
+            --btn-green: #00ff88;
+            --btn-red: #ff3366;
             --neon-glow: 0 0 15px rgba(0, 210, 255, 0.4);
             --primary-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
         }
         body {
             background: var(--primary-gradient);
             color: #fff;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Poppins', sans-serif;
             min-height: 100vh;
-            overflow-x: hidden;
         }
-        .fade-up { animation: fadeUp 0.6s ease-out; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .navbar { background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .nav-logo { font-size: 1.4rem; font-weight: 800; color: var(--accent-cyan); text-shadow: var(--neon-glow); }
 
         .hero-section {
-            padding: 60px 20px;
+            padding: 40px 20px;
             text-align: center;
-            background: radial-gradient(circle at top, rgba(0, 210, 255, 0.1) 0%, transparent 70%);
         }
-        .welcome-msg { font-size: 2.5rem; font-weight: 900; background: linear-gradient(to right, #00d2ff, #92fe9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        .welcome-msg { font-size: 2rem; font-weight: 900; background: linear-gradient(to right, #00d2ff, #92fe9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
+        /* টুল কার্ড স্টাইল - ইউজাররা সবসময় দেখতে পারবে */
         .tool-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 22px;
-            padding: 25px 15px;
+            border-radius: 20px;
+            padding: 20px 10px;
             transition: 0.3s;
             text-align: center;
+            position: relative;
             cursor: pointer;
         }
-        .tool-card:hover { border-color: var(--accent-cyan); transform: translateY(-5px); box-shadow: var(--neon-glow); }
+        .tool-card:hover { 
+            border-color: var(--accent-cyan); 
+            transform: translateY(-5px);
+            background: rgba(0, 210, 255, 0.05);
+        }
+        
         .tool-icon { font-size: 2.2rem; color: var(--accent-cyan); margin-bottom: 10px; }
-        .tool-name { font-weight: 700; color: var(--accent-cyan); text-transform: uppercase; font-size: 0.9rem; }
+        .tool-name { font-size: 0.85rem; font-weight: 700; color: #fff; }
 
-        /* Sidebar Style */
+        /* স্ট্যাটাস ইন্ডিকেটর */
+        .status-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .dot-active { background: var(--btn-green); box-shadow: 0 0 10px var(--btn-green); }
+        .dot-off { background: var(--btn-red); box-shadow: 0 0 10px var(--btn-red); }
+
+        /* সাইডবার */
         .offcanvas { background: #0a0e17 !important; border-right: 1px solid var(--accent-cyan); }
         .menu-item { padding: 15px 20px; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* Ultra Premium Modal */
-        .modal-content {
-            background: #0f121d;
-            border: 2px solid var(--accent-cyan);
-            border-radius: 25px;
-            box-shadow: var(--neon-glow);
-        }
-        .tg-link {
-            background: linear-gradient(45deg, #0088cc, #00d2ff);
-            color: white;
-            border-radius: 50px;
-            padding: 12px 30px;
-            text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 15px;
-        }
+        /* মোডাল */
+        .modal-content { background: #0f121d; border: 2px solid var(--accent-cyan); border-radius: 25px; }
+        .tg-link { background: linear-gradient(45deg, #0088cc, #00d2ff); color: white; border-radius: 50px; padding: 10px 25px; text-decoration: none; font-weight: bold; margin-top: 15px; display: inline-block; }
     </style>
 </head>
-<body class="fade-up">
+<body>
 
     <nav class="navbar navbar-dark sticky-top">
         <div class="container-fluid">
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
                 <i class="fas fa-bars text-white fs-3"></i>
             </button>
-            <span class="nav-logo">GOURAB <span style="color: #fff;">PANEL-V1</span></span>
+            <span class="nav-logo">GOURAB <span style="color: #fff;">CORE-V1</span></span>
         </div>
     </nav>
 
     <div class="offcanvas offcanvas-start" id="sidebar">
         <div class="offcanvas-header border-bottom border-secondary">
-            <h5 class="offcanvas-title text-info fw-bold">MENU OPTIONS</h5>
+            <h5 class="offcanvas-title text-info fw-bold">MASTER MENU</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
-        <div class="offcanvas-body p-0" id="sidebarItems">
-            </div>
+        <div class="offcanvas-body p-0" id="sidebarItems"></div>
     </div>
 
     <div class="hero-section">
-        <h1 class="welcome-msg" id="welcomeText">Loading...</h1>
-        <p class="opacity-75">নিচে আপনার টুলসগুলোর ডিটেইলস দেওয়া হলো।</p>
+        <h1 class="welcome-msg" id="welcomeText">স্বাগতম!</h1>
+        <p class="opacity-75">আপনার পছন্দের টুলটি সিলেক্ট করে কাজ শুরু করুন।</p>
     </div>
 
     <div class="container pb-5">
-        <div class="row g-4" id="checkersContainer"></div>
+        <div class="row g-3" id="checkersContainer">
+            </div>
     </div>
 
-    <div class="modal fade" id="adminModal" tabindex="-1">
+    <div class="modal fade" id="accessModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-center p-4">
                 <div class="modal-body">
-                    <i class="fas fa-user-shield text-info fs-1 mb-3"></i>
-                    <h4 id="userGreeting" class="text-white fw-bold"></h4>
-                    <p id="toolDetail" class="text-secondary mt-2"></p>
-                    <a href="https://t.me/gourab_tech" target="_blank" class="tg-link">
-                        <i class="fab fa-telegram-plane me-2"></i>অ্যাডমিনকে মেসেজ দিন
-                    </a>
+                    <i class="fas fa-user-lock text-danger fs-1 mb-3"></i>
+                    <h4 class="text-white fw-bold">এক্সেস লিমিটেড!</h4>
+                    <p id="accessMsg" class="text-secondary mt-2"></p>
+                    <a href="https://t.me/gourab_tech" target="_blank" class="tg-link">Contact Admin to Enable</a>
                 </div>
             </div>
         </div>
@@ -116,55 +115,74 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let userName = "User";
-
         async function initDashboard() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) { window.location.href = '/login.html'; return; }
+
             try {
-                const userId = localStorage.getItem('userId');
-                if (!userId) { window.location.href = '/login.html'; return; }
-
-                // সিমুলেটেড ডাটা (আপনার এপিআই অনুযায়ী পরিবর্তন করে নিন)
-                userName = "Gourab"; 
-                document.getElementById('welcomeText').innerText = `Welcome, ${userName}`;
-
+                // সার্ভার থেকে ইউজারের পারমিশন ডাটা আনা হচ্ছে
+                const res = await fetch(`/api/user/profile?userId=${userId}`);
+                const data = await res.json();
+                
+                document.getElementById('welcomeText').innerText = `Hello, ${data.name}!`;
+                
+                // এডমিন যে যে টুলগুলো এক্টিভ করেছে তার লিস্ট
+                const activeTools = data.permissions?.activeCheckers || [];
+                
                 const container = document.getElementById('checkersContainer');
                 const sidebar = document.getElementById('sidebarItems');
 
-                const allTools = [
-                    { name: 'FB-Pro Check', icon: 'fab fa-facebook', desc: 'এটি ফেসবুক আইডির সিকিউরিটি এবং স্ট্যাটাস চেক করার একটি শক্তিশালী টুল।' },
-                    { name: 'Pass-Strength', icon: 'fas fa-shield-virus', desc: 'আপনার পাসওয়ার্ড কতটা শক্তিশালী তা এই টুল দিয়ে যাচাই করা যায়।' },
-                    { name: 'IP-Tracker', icon: 'fas fa-network-wired', desc: 'যেকোনো আইপি অ্যাড্রেসের সঠিক লোকেশন এবং তথ্য বের করার টুল।' },
-                    { name: 'Mail-Pro', icon: 'fas fa-envelope-open-text', desc: 'ইমেইল ভ্যালিডেশন এবং ডাটা ব্রিচ চেক করার জন্য এটি ব্যবহার করুন।' },
-                    { name: 'Dev-Scanner', icon: 'fas fa-code-branch', desc: 'ডেভেলপার মোড এবং অ্যাপ সিকিউরিটি স্ক্যান করার আল্ট্রা টুল।' },
-                    { name: 'Link-Safe', icon: 'fas fa-link', desc: 'কোনো লিংকে ম্যালওয়্যার বা ফিশিং আছে কি না তা আগেভাগেই চেক করুন।' },
-                    { name: 'User-Hunt', icon: 'fas fa-search-dollar', desc: 'অনলাইনে ইউজার অ্যাক্টিভিটি এবং ট্র্যাকিং করার স্পেশাল টুল।' },
-                    { name: 'Firewall', icon: 'fas fa-user-shield', desc: 'আপনার ওয়েবসাইট বা সার্ভারে এক্সট্রা সিকিউরিটি লেয়ার যোগ করার টুল।' }
+                const toolsList = [
+                    { id: 'FB-Check', name: 'FB-Pro Check', icon: 'fab fa-facebook' },
+                    { id: 'Pass-Pro', name: 'Pass-Strength', icon: 'fas fa-shield-virus' },
+                    { id: 'IP-Scan', name: 'IP-Tracker', icon: 'fas fa-network-wired' },
+                    { id: 'Mail-Pro', name: 'Mail-Pro', icon: 'fas fa-envelope-open-text' },
+                    { id: 'Dev-Scanner', name: 'Dev-Scanner', icon: 'fas fa-code-branch' },
+                    { id: 'Link-Safe', name: 'Link-Safe', icon: 'fas fa-link' },
+                    { id: 'User-Hunt', name: 'User-Hunt', icon: 'fas fa-search-dollar' },
+                    { id: 'Firewall', name: 'Firewall', icon: 'fas fa-user-shield' }
                 ];
 
-                allTools.forEach(tool => {
+                toolsList.forEach(tool => {
+                    const isLive = activeTools.includes(tool.id);
+                    
+                    // ড্যাশবোর্ড কার্ড (সবসময় ভিজিবল থাকবে)
                     container.innerHTML += `
                         <div class="col-6 col-md-3">
-                            <div class="tool-card" onclick="openAdminMsg('${tool.name}', '${tool.desc}')">
+                            <div class="tool-card" onclick="handleToolClick('${tool.id}', ${isLive}, '${tool.name}')">
                                 <div class="tool-icon"><i class="${tool.icon}"></i></div>
                                 <div class="tool-name">${tool.name}</div>
+                                <div style="font-size: 0.6rem; margin-top: 5px; opacity: 0.8;">
+                                    <span class="status-dot ${isLive ? 'dot-active' : 'dot-off'}"></span>
+                                    ${isLive ? 'Online' : 'Offline'}
+                                </div>
                             </div>
                         </div>`;
                     
+                    // সাইডবার
                     sidebar.innerHTML += `
-                        <a href="#" class="menu-item" onclick="openAdminMsg('${tool.name}', '${tool.desc}')">
-                            <i class="${tool.icon}"></i> ${tool.name}
+                        <a href="#" class="menu-item" onclick="handleToolClick('${tool.id}', ${isLive}, '${tool.name}')">
+                            <i class="${tool.icon} text-info"></i> ${tool.name}
                         </a>`;
                 });
+
             } catch (err) { console.error(err); }
         }
 
-        function openAdminMsg(name, desc) {
-            document.getElementById('userGreeting').innerText = `প্রিয় ${userName}!`;
-            document.getElementById('toolDetail').innerHTML = `<b>${name}:</b> ${desc}<br><br><span class="text-warning">এই টুলটি এক্টিভেট করতে অ্যাডমিনের অনুমতি প্রয়োজন।</span>`;
-            new bootstrap.Modal(document.getElementById('adminModal')).show();
+        // টুল হ্যান্ডলার: এডমিন অন রাখলে কাজ করবে, অফ করলে মোডাল দেখাবে
+        function handleToolClick(id, isLive, name) {
+            if (isLive) {
+                // টুল এক্টিভ থাকলে সেই লিংকে নিয়ে যাবে
+                window.location.href = `/tools/${id.toLowerCase()}.html`;
+            } else {
+                // টুল ইন-এক্টিভ থাকলে মেসেজ দেখাবে
+                document.getElementById('accessMsg').innerHTML = `দুঃখিত <b>${name}</b> টুলটি বর্তমানে আপনার জন্য বন্ধ আছে। <br> এটি চালু করতে চাইলে এডমিনের সাথে যোগাযোগ করুন।`;
+                new bootstrap.Modal(document.getElementById('accessModal')).show();
+            }
         }
 
         window.onload = initDashboard;
     </script>
 </body>
 </html>
+
