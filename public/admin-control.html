@@ -3,512 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gourab Master Control V1</title>
+    <title>Gourab Ultra Control | Master Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-bg: #111827; /* Dark grayish-blue */
-            --card-bg: rgba(255, 255, 255, 0.08); /* Transparent with opacity */
-            --text-color: #f3f4f6; /* Light gray */
-            --accent-color: #06b6d4; /* Cyan/Teal */
-            --success-color: #22c55e; /* Green */
-            --danger-color: #ef4444; /* Red */
+            --bg-master: #070b14;
+            --card-glass: rgba(255, 255, 255, 0.03);
+            --accent-cyan: #00f2ff;
+            --accent-purple: #7000ff;
+            --btn-green: #00ff87;
+            --btn-red: #ff3e3e;
+            --text-glow: #e0faff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 600px;
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            animation: fadeIn 0.8s ease;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 2rem;
-            color: var(--text-color);
-            margin-bottom: 30px;
-            font-weight: 700;
-        }
-
-        .control-group {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .control-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .control-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--accent-color);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: var(--text-color);
-        }
-
-        .btn-success { background: var(--success-color); }
-        .btn-danger { background: var(--danger-color); }
-        .btn-primary { background: var(--accent-color); color: #000; }
-
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
-
-        /* Input Styles */
-        input[type="text"], input[type="url"] {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: var(--text-color);
-            font-size: 1rem;
-            margin-top: 10px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
-        }
-
-        /* Checkbox Styles */
-        .checkers-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Admin V2 | Gourab Tech</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-dark: #0f141e;
-            --card-bg: #1a202c;
-            --accent-cyan: #00d2ff;
-            --btn-green: #22c55e;
-            --btn-red: #ef4444;
-            --text-gray: #a0aec0;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-dark); color: white; padding: 20px; }
-
-        .container { width: 100%; max-width: 600px; margin: auto; }
-        h1 { text-align: center; color: var(--accent-cyan); font-size: 1.8rem; margin: 20px 0; text-transform: uppercase; letter-spacing: 2px; }
-
-        /* প্রধান কার্ড স্টাইল (আপনার ২য় ছবির মতো) */
-        .control-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .card-header {
-            color: var(--accent-cyan);
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* বাটন স্টাইল */
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn {
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            color: white;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-on { background: var(--btn-green); }
-        .btn-off { background: var(--btn-red); }
-        .btn-update { 
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5); 
-            width: 100%; margin-top: 15px; 
-        }
-
-        /* ইনপুট বক্স */
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            background: #0b0f16;
-            border: 1px solid #2d3748;
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        /* ইউজার কন্ট্রোল সেকশন (নিচে থাকবে) */
-        .user-section-title { margin-top: 40px; margin-bottom: 20px; color: var(--accent-cyan); }
-        
-        .user-card {
-            background: #161b26;
-            border: 1px solid var(--accent-cyan);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .checker-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .checker-item {
-            background: #0f141e;
-            padding: 12px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-        }
-
-        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent-cyan); }
-
-        @media (max-width: 480px) { .checker-grid { grid-template-columns: 1fr; } }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <h1>MASTER ADMIN V2</h1>
-
-        <div class="control-card">
-            <div class="card-header"><i class="fas fa-power-off"></i> System Status</div>
-            <div class="btn-row">
-                <button class="btn btn-on" onclick="updateGlobal({isSiteActive: true})"><i class="fas fa-check-circle"></i> SITE ON</button>
-                <button class="btn btn-off" onclick="updateGlobal({isSiteActive: false})"><i class="fas fa-times-circle"></i> SITE OFF</button>
-            </div>
-        </div>
-
-        <div class="control-card">
-            <div class="card-header"><i class="fas fa-crown"></i> Premium Access</div>
-            <div class="btn-row">
-                <button class="btn btn-on" onclick="updateGlobal({isPremiumMode: true})">ENABLE PRO</button>
-                <button class="btn btn-off" onclick="updateGlobal({isPremiumMode: false})">DISABLE PRO</button>
-            </div>
-        </div>
-
-        <div class="control-card">
-            <div class="card-header"><i class="fas fa-money-bill-wave"></i> Payment & Price Control</div>
-            <input type="text" id="pPrice" placeholder="টাকার পরিমাণ লিখুন...">
-            <button class="btn btn-update" onclick="savePayment()">Update Price Info</button>
-        </div>
-
-        <h2 class="user-section-title"><i class="fas fa-users-cog"></i> User Custom Control</h2>
-        
-        <div id="userContainer">
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Admin V2 | Gourab Tech</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-dark: #0f141e;
-            --card-bg: rgba(255, 255, 255, 0.08);
-            --accent-cyan: #00d2ff;
-            --btn-green: #22c55e;
-            --btn-red: #ef4444;
-            --text-color: #f3f4f6;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         
         body { 
-            background-color: var(--bg-dark); 
-            color: var(--text-color); 
-            padding: 20px;
-            display: flex;
-            justify-content: center;
+            background: radial-gradient(circle at top right, #1a1f35, var(--bg-master));
+            color: white;
+            padding: 15px;
             min-height: 100vh;
         }
 
-        .container { width: 100%; max-width: 600px; animation: fadeIn 0.8s ease; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .container { width: 100%; max-width: 550px; margin: auto; animation: slideIn 0.6s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         h1 { 
             text-align: center; 
-            color: var(--accent-cyan); 
-            font-size: 1.8rem; 
-            margin: 20px 0; 
-            text-transform: uppercase; 
-            letter-spacing: 2px;
-            font-weight: 800;
+            font-size: 1.6rem; 
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 25px 0;
+            letter-spacing: 3px;
+            font-weight: 900;
         }
 
-        /* কন্ট্রোল কার্ড ডিজাইন */
+        /* --- স্মার্ট কার্ড ডিজাইন --- */
         .control-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
+            background: var(--card-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
-        .card-header {
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
             color: var(--accent-cyan);
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            text-transform: uppercase;
         }
 
-        /* বাটন স্টাইল */
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        /* --- গ্রিড বাটন সিস্টেম --- */
+        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
-        .btn {
-            padding: 12px;
+        .master-btn {
+            padding: 14px;
             border: none;
-            border-radius: 10px;
+            border-radius: 14px;
             font-weight: 700;
-            color: white;
             cursor: pointer;
-            transition: 0.3s ease;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            font-size: 0.9rem;
-        }
-
-        .btn:hover { transform: translateY(-3px); opacity: 0.9; }
-
-        .btn-on { background: var(--btn-green); }
-        .btn-off { background: var(--btn-red); }
-        .btn-update { 
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5); 
-            width: 100%; margin-top: 15px;
+            font-size: 0.85rem;
             color: #000;
         }
 
-        /* ইনপুট বক্স */
-        input[type="text"] {
+        .master-btn:active { transform: scale(0.95); }
+
+        .btn-cyan { background: var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
+        .btn-red { background: var(--btn-red); color: white; }
+        .btn-green { background: var(--btn-green); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); }
+
+        /* --- থিম সিলেক্টর স্টাইল --- */
+        .theme-select {
             width: 100%;
             padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            background: rgba(0,0,0,0.5);
             color: white;
-            font-size: 1rem;
-            margin-top: 5px;
+            border-radius: 12px;
+            border: 1px solid var(--accent-cyan);
+            outline: none;
+            margin-bottom: 10px;
         }
 
-        input:focus { outline: none; border-color: var(--accent-cyan); }
+        /* --- আল্ট্রা ইনপুট --- */
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
 
-        /* ইউজার কন্ট্রোল সেকশন */
-        .user-section-title { margin: 35px 0 20px; color: var(--accent-cyan); font-weight: 700; border-left: 4px solid var(--accent-cyan); padding-left: 10px; }
-        
+        /* --- ইউজার সেকশন --- */
         .user-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent-cyan);
         }
 
-        .user-info { font-weight: 700; font-size: 1rem; margin-bottom: 12px; color: #fff; }
+        .user-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .user-name { font-weight: 700; color: #fff; font-size: 1.05rem; }
+        .user-email { font-size: 0.75rem; color: #888; display: block; }
 
-        .checker-grid {
+        .tools-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
-        .checker-item {
-            background: rgba(0,0,0,0.2);
+        .tool-box {
+            background: rgba(0,0,0,0.3);
             padding: 10px;
-            border-radius: 8px;
+            border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
-        input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; }
+        .toggle-switch {
+            width: 35px;
+            height: 18px;
+            appearance: none;
+            background: #333;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle-switch:checked { background: var(--btn-green); }
+        .toggle-switch::before {
+            content: '';
+            width: 14px; height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute; top: 2px; left: 2px;
+            transition: 0.3s;
+        }
+        .toggle-switch:checked::before { left: 19px; }
 
-        @media (max-width: 480px) { .checker-grid { grid-template-columns: 1fr; } }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .status-active { background: rgba(0, 255, 135, 0.1); color: var(--btn-green); }
+
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>MASTER CONTROL V2</h1>
+        <h1>GOURAB MASTER V2</h1>
 
         <div class="control-card">
-            <div class="card-header"><i class="fas fa-power-off"></i> System Status</div>
-            <div class="btn-row">
-                <button class="btn btn-on" onclick="updateGlobal({isSiteActive: true})"><i class="fas fa-check-circle"></i> SITE ON</button>
-                <button class="btn btn-off" onclick="updateGlobal({isSiteActive: false})"><i class="fas fa-times-circle"></i> SITE OFF</button>
+            <div class="card-title"><i class="fas fa-microchip"></i> Server Control</div>
+            <div class="grid-buttons">
+                <button class="master-btn btn-green" onclick="updateSite(true)"><i class="fas fa-play"></i> LIVE ON</button>
+                <button class="master-btn btn-red" onclick="updateSite(false)"><i class="fas fa-power-off"></i> KILL SITE</button>
             </div>
         </div>
 
         <div class="control-card">
-            <div class="card-header"><i class="fas fa-crown"></i> Premium Access</div>
-            <div class="btn-row">
-                <button class="btn btn-on" onclick="updateGlobal({isPremiumMode: true})">ENABLE PRO</button>
-                <button class="btn btn-off" onclick="updateGlobal({isPremiumMode: false})">DISABLE PRO</button>
+            <div class="card-title"><i class="fas fa-paint-brush"></i> UI Theme & Access</div>
+            <select id="themeSelect" class="theme-select">
+                <option value="dark-ocean">Dark Ocean (ডিফল্ট)</option>
+                <option value="neon-night">Neon Night (নীল-গোলাপি)</option>
+                <option value="gold-premium">Gold Premium (রাজকীয়)</option>
+                <option value="cyber-punk">Cyber Punk (হলুদ-কালো)</option>
+            </select>
+            <div class="grid-buttons">
+                <button class="master-btn btn-cyan" onclick="updateReg(true)">REG OPEN</button>
+                <button class="master-btn btn-outline" onclick="updateReg(false)">REG CLOSED</button>
+            </div>
+            <button class="master-btn btn-cyan" style="width: 100%; margin-top: 10px;" onclick="saveTheme()">APPLY NEW THEME</button>
+        </div>
+
+        <div class="control-card">
+            <div class="card-title"><i class="fas fa-database"></i> Database Engine</div>
+            <div class="grid-buttons">
+                <button class="master-btn btn-cyan" onclick="switchDB('primary')">PRIMARY CLOUD</button>
+                <button class="master-btn btn-outline" onclick="switchDB('backup')">BACKUP CLOUD</button>
             </div>
         </div>
 
         <div class="control-card">
-            <div class="card-header"><i class="fas fa-money-bill-wave"></i> Price Control</div>
-            <input type="text" id="pPrice" placeholder="টাকার পরিমাণ লিখুন...">
-            <button class="btn btn-update" onclick="savePayment()">Update Price Info</button>
+            <div class="card-title"><i class="fas fa-bell"></i> Global Notice</div>
+            <div class="input-group">
+                <input type="text" id="globalNotice" placeholder="ইউজারদের জন্য কোনো বার্তা লিখুন...">
+                <button class="master-btn btn-cyan" style="width: 100%; margin-top: 12px;" onclick="saveNotice()">PUSH NOTICE</button>
+            </div>
         </div>
 
-        <h2 class="user-section-title"><i class="fas fa-users-cog"></i> User Management</h2>
+        <h2 style="color: var(--accent-cyan); font-size: 1.1rem; margin: 30px 0 15px; letter-spacing: 1px;">
+            <i class="fas fa-users"></i> LIVE USER MANAGEMENT
+        </h2>
         
-        <div id="userContainer">
-            <p style="text-align:center; opacity:0.5;">লোডিং হচ্ছে...</p>
-        </div>
+        <div id="userList"></div>
     </div>
 
     <script>
-        // গ্লোবাল সেটিংস আপডেট
-        async function updateGlobal(data) {
-            try {
-                const res = await fetch('/api/admin/update-settings', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
-                });
-                if(res.ok) alert("সিস্টেম সফলভাবে আপডেট হয়েছে!");
-            } catch (e) { alert("Error updating settings"); }
+        async function updateSite(status) {
+            await fetch('/api/admin/update-settings', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ isSiteActive: status })
+            });
+            alert(status ? "সাইট লাইভ হয়েছে!" : "সাইট অফ করা হয়েছে!");
         }
 
-        // পেমেন্ট সেভ করা
-        async function savePayment() {
-            const price = document.getElementById('pPrice').value;
-            await updateGlobal({ paymentPrice: price });
+        async function updateReg(status) {
+            const msg = status ? "নতুন রেজিস্ট্রেশন চালু" : "এডমিন রেজিস্ট্রেশন অফ করে দিয়েছে, এডমিনের সাথে যোগাযোগ করুন।";
+            await fetch('/api/admin/update-settings', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ isPremiumMode: status, registerNotice: msg })
+            });
+            alert("রেজিস্ট্রেশন এক্সেস আপডেট হয়েছে!");
         }
 
-        // ইউজার লিস্ট আনা
-        async function fetchUsers() {
-            try {
-                const res = await fetch('/api/admin/users');
-                const users = await res.json();
-                const container = document.getElementById('userContainer');
-                container.innerHTML = '';
+        async function saveTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            await fetch('/api/admin/update-settings', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    "themeConfig.loginTheme": theme,
+                    "themeConfig.registerTheme": theme 
+                })
+            });
+            alert("লগইন ও রেজিস্ট্রেশন থিম পরিবর্তন করা হয়েছে!");
+        }
 
-                // ৮টি চেকার টুলের নাম (ড্যাশবোর্ডের সাথে মিলিয়ে)
-                const tools = ['FB-Check', 'Pass-Pro', 'IP-Scan', 'Mail-Pro', 'Dev-Scanner', 'Link-Safe', 'User-Hunt', 'Firewall'];
+        async function switchDB(type) {
+            const res = await fetch('/api/admin/switch-db', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ dbType: type })
+            });
+            const data = await res.json();
+            alert(data.message);
+        }
 
-                users.forEach(user => {
-                    container.innerHTML += `
-                        <div class="user-card">
-                            <div class="user-info">
-                                <i class="fas fa-user-circle"></i> ${user.name} 
-                                <span style="font-size:0.7rem; color:var(--accent-cyan); display:block; opacity:0.7;">${user.email}</span>
-                            </div>
-                            <div class="checker-grid">
-                                ${tools.map((tool, i) => `
-                                    <div class="checker-item">
-                                        <label>${tool}</label>
-                                        <input type="checkbox" id="tool-${user._id}-${i}" ${user.permissions?.activeCheckers?.includes(tool) ? 'checked' : ''}>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <div class="btn-row">
-                                <button class="btn btn-on" style="background:#3b82f6" onclick="manageUser('${user._id}', 'Approved')">Save Settings</button>
-                                <button class="btn btn-off" onclick="manageUser('${user._id}', 'Blocked')">Block User</button>
-                            </div>
+        async function saveNotice() {
+            const note = document.getElementById('globalNotice').value;
+            await fetch('/api/admin/update-settings', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ displayNotice: note })
+            });
+            alert("সবার ড্যাশবোর্ডে নোটিশ পাঠানো হয়েছে!");
+        }
+
+        async function loadUsers() {
+            const res = await fetch('/api/admin/users');
+            const users = await res.json();
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+            const tools = ['FB-Check', 'Pass-Pro', 'IP-Scan', 'Mail-Pro', 'Dev-Scanner', 'Link-Safe', 'User-Hunt', 'Firewall'];
+
+            users.forEach(user => {
+                list.innerHTML += `
+                    <div class="user-card">
+                        <div class="user-header">
+                            <div><span class="user-name">${user.name}</span><span class="user-email">${user.email}</span></div>
+                            <span class="status-badge ${user.status === 'Approved' ? 'status-active' : ''}">${user.status}</span>
                         </div>
-                    `;
-                });
-            } catch (e) { console.error("Error fetching users", e); }
+                        <div class="tools-container">
+                            ${tools.map((t, i) => `
+                                <div class="tool-box"><span>${t}</span>
+                                <input type="checkbox" class="toggle-switch" id="tool-${user._id}-${i}" 
+                                ${user.permissions?.activeCheckers?.includes(t) ? 'checked' : ''}></div>
+                            `).join('')}
+                        </div>
+                        <div class="grid-buttons">
+                            <button class="master-btn btn-cyan" onclick="saveUser('${user._id}', 'Approved')">SAVE</button>
+                            <button class="master-btn btn-red" onclick="saveUser('${user._id}', 'Blocked')">BLOCK</button>
+                        </div>
+                    </div>`;
+            });
         }
 
-        // ইউজারের পারমিশন ও স্ট্যাটাস সেভ করা
-        async function manageUser(userId, status) {
+        async function saveUser(userId, status) {
             const checkers = [];
             const labels = ['FB-Check', 'Pass-Pro', 'IP-Scan', 'Mail-Pro', 'Dev-Scanner', 'Link-Safe', 'User-Hunt', 'Firewall'];
-            
             for(let i=0; i<8; i++) {
-                const checkbox = document.getElementById(`tool-${userId}-${i}`);
-                if(checkbox && checkbox.checked) checkers.push(labels[i]);
+                const cb = document.getElementById(`tool-${userId}-${i}`);
+                if(cb && cb.checked) checkers.push(labels[i]);
             }
-
-            try {
-                const res = await fetch('/api/admin/manage-user', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ userId, status, checkers })
-                });
-                if(res.ok) {
-                    alert(`ইউজার ${status === 'Blocked' ? 'ব্লক' : 'আপডেট'} করা হয়েছে!`);
-                    fetchUsers();
-                }
-            } catch (e) { alert("Action failed!"); }
+            await fetch('/api/admin/manage-user', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ userId, status, checkers })
+            });
+            alert("ইউজার আপডেট সফল!");
+            loadUsers();
         }
 
-        window.onload = fetchUsers;
+        window.onload = loadUsers;
     </script>
 </body>
 </html>
