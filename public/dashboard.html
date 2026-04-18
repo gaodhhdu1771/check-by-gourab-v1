@@ -7,7 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* তোমার আগের সব স্টাইল এখানে হুবহু থাকবে */
         :root {
             --bg-dark: #080b12;
             --accent-cyan: #00d2ff;
@@ -21,14 +20,46 @@
             color: #fff;
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
+            margin: 0;
         }
-        /* ... তোমার বাকি সব CSS ... */
+
         .navbar { background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .nav-logo { font-size: 1.4rem; font-weight: 800; color: var(--accent-cyan); text-shadow: var(--neon-glow); }
-        .tool-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px 10px; transition: 0.3s; text-align: center; cursor: pointer; }
+
+        .hero-section { padding: 40px 20px; text-align: center; }
+        .welcome-msg { font-size: 2.2rem; font-weight: 900; background: linear-gradient(to right, #00d2ff, #92fe9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px 10px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            cursor: pointer;
+            height: 100%;
+        }
+        .tool-card:hover { 
+            border-color: var(--accent-cyan); 
+            transform: translateY(-8px);
+            background: rgba(0, 210, 255, 0.1);
+            box-shadow: var(--neon-glow);
+        }
+        
+        .tool-icon { font-size: 2.5rem; color: var(--accent-cyan); margin-bottom: 12px; }
+        .tool-name { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .dot-active { background: var(--btn-green); box-shadow: 0 0 8px var(--btn-green); }
         .dot-off { background: var(--btn-red); box-shadow: 0 0 8px var(--btn-red); }
+
+        .offcanvas { background: #0a0e17 !important; border-right: 1px solid var(--accent-cyan); width: 280px !important; }
+        .menu-item { padding: 15px 20px; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
+        .menu-item:hover { background: rgba(0, 210, 255, 0.1); color: var(--accent-cyan); }
+
+        .modal-content { background: #0f121d; border: 2px solid var(--accent-cyan); border-radius: 25px; color: white; }
+        .tg-link { background: linear-gradient(45deg, #0088cc, #00d2ff); color: white; border-radius: 50px; padding: 10px 25px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -47,19 +78,34 @@
             <h5 class="offcanvas-title text-info fw-bold">MASTER MENU</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
-        <div class="offcanvas-body p-0" id="sidebarItems"></div>
+        <div class="offcanvas-body p-0" id="sidebarItems">
+            </div>
         <div class="p-3 border-top border-secondary">
             <button onclick="logout()" class="btn btn-outline-danger w-100 rounded-pill">Logout</button>
         </div>
     </div>
 
-    <div class="hero-section text-center p-4">
-        <h1 class="welcome-msg" id="welcomeText" style="font-size: 2rem; font-weight: 900; background: linear-gradient(to right, #00d2ff, #92fe9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">লোড হচ্ছে...</h1>
-        <p class="opacity-75">আপনার জন্য নির্ধারিত টুলসগুলো নিচে দেওয়া হলো।</p>
+    <div class="hero-section">
+        <h1 class="welcome-msg" id="welcomeText">লোড হচ্ছে...</h1>
+        <p class="opacity-75">আপনার জন্য নির্ধারিত ৮টি প্রিমিয়াম টুল নিচে দেওয়া হলো।</p>
     </div>
 
     <div class="container pb-5">
-        <div class="row g-3" id="checkersContainer"></div>
+        <div class="row g-3" id="checkersContainer">
+            </div>
+    </div>
+
+    <div class="modal fade" id="accessModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4">
+                <div class="modal-body">
+                    <i class="fas fa-user-lock text-danger fs-1 mb-3"></i>
+                    <h4 class="fw-bold">অ্যাক্সেস লিমিটেড!</h4>
+                    <p id="accessMsg" class="text-secondary mt-2"></p>
+                    <a href="https://t.me/gourab_tech" target="_blank" class="tg-link">Contact Admin to Enable</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -69,7 +115,7 @@
             if (!userId) { window.location.href = '/login.html'; return; }
 
             try {
-                // তোমার নতুন সার্ভার এপিআই কল
+                // তোমার ব্যাকএন্ড এপিআই কল
                 const res = await fetch('/api/user/me', {
                     headers: { 'user-id': userId }
                 });
@@ -84,18 +130,19 @@
                 const user = await res.json();
                 document.getElementById('welcomeText').innerText = `Hello, ${user.name}!`;
 
-                // ডাটাবেজ থেকে অনুমোদিত টুলসের লিস্ট
-                const activeTools = user.permissions || [];
+                // ডাটাবেজ থেকে আসা পারমিশনগুলো ক্লিন করা
+                const rawPermissions = user.permissions || [];
+                const activeTools = rawPermissions.map(p => p.toString().trim().replace(/,$/, ''));
                 
-                // তোমার গিটহাবের ৮টি টুলের সঠিক প্রোফাইল
-                const fullToolsList = [
+                // তোমার ৮টি টুলের লিস্ট (আইডিগুলো ডাটাবেজের সাথে মিল রাখা হয়েছে)
+                const toolsList = [
                     { id: '2fa-slit', name: '2FA Slit', icon: 'fas fa-key' },
                     { id: 'data-reporter', name: 'Data Reporter', icon: 'fas fa-file-medical-alt' },
-                    { id: 'fb-check', name: 'FB Check PRO', icon: 'fab fa-facebook-square' },
+                    { id: 'fb-check', name: 'Facebook Check', icon: 'fab fa-facebook-square' },
                     { id: 'geo-sync', name: 'Geo-Sync Gen', icon: 'fas fa-id-card' },
                     { id: 'mail-validator', name: 'Mail Validator', icon: 'fas fa-envelope-open-text' },
                     { id: 'network-trace', name: 'Network Trace', icon: 'fas fa-network-wired' },
-                    { id: 'tg-slit', name: 'TG Slit', icon: 'fab fa-telegram-plane' },
+                    { id: 'tg-slit', name: 'Telegram Slit', icon: 'fab fa-telegram-plane' },
                     { id: 'time-smary', name: 'Time Summary', icon: 'fas fa-history' }
                 ];
 
@@ -104,40 +151,42 @@
                 container.innerHTML = '';
                 sidebar.innerHTML = '';
 
-                fullToolsList.forEach(tool => {
-                    // অ্যাডমিন যদি পারমিশন দেয় অথবা ইউজার নিজেই অ্যাডমিন হয়
-                    const isLive = activeTools.includes(tool.id) || user.role === 'admin';
+                toolsList.forEach(tool => {
+                    // ইউজার অ্যাডমিন হলে সব টুলস একটিভ
+                    const isLive = user.role === 'admin' || activeTools.includes(tool.id);
                     
-                    // ড্যাশবোর্ড কার্ড রেন্ডার
+                    // ড্যাশবোর্ড কার্ড
                     container.innerHTML += `
                         <div class="col-6 col-md-3">
                             <div class="tool-card shadow-sm" onclick="handleToolClick('${tool.id}', ${isLive}, '${tool.name}')">
-                                <div class="tool-icon" style="font-size: 2.5rem; color: #00d2ff; margin-bottom: 12px;"><i class="${tool.icon}"></i></div>
-                                <div class="tool-name" style="font-size: 0.9rem; font-weight: 700;">${tool.name}</div>
-                                <div style="font-size: 0.65rem;">
+                                <div class="tool-icon"><i class="${tool.icon}"></i></div>
+                                <div class="tool-name">${tool.name}</div>
+                                <div style="font-size: 0.7rem;">
                                     <span class="status-dot ${isLive ? 'dot-active' : 'dot-off'}"></span>
                                     <span class="${isLive ? 'text-success' : 'text-danger'}">${isLive ? 'Active' : 'Locked'}</span>
                                 </div>
                             </div>
                         </div>`;
                     
-                    // সাইডবার আপডেট
+                    // সাইডবার আইটেম
                     sidebar.innerHTML += `
-                        <a href="#" class="menu-item" onclick="handleToolClick('${tool.id}', ${isLive}, '${tool.name}')" style="padding: 15px 20px; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <a href="#" class="menu-item" onclick="handleToolClick('${tool.id}', ${isLive}, '${tool.name}')">
                             <i class="${tool.icon} ${isLive ? 'text-info' : 'text-secondary'}"></i> ${tool.name}
                         </a>`;
                 });
 
             } catch (err) { 
-                console.error("Dashboard Error:", err);
+                console.error("Dashboard Init Error:", err);
             }
         }
 
         function handleToolClick(id, isLive, name) {
             if (isLive) {
+                // তোমার public/tools/ ফোল্ডারের ফাইল ওপেন করবে
                 window.location.href = `/tools/${id}.html`;
             } else {
-                alert(`দুঃখিত! ${name} টুলটি আপনার জন্য লক করা। অ্যাডমিনের সাথে যোগাযোগ করুন।`);
+                document.getElementById('accessMsg').innerHTML = `দুঃখিত <b>${name}</b> টুলটি বর্তমানে লক করা আছে। এটি চালু করতে অ্যাডমিনের অনুমতি প্রয়োজন।`;
+                new bootstrap.Modal(document.getElementById('accessModal')).show();
             }
         }
 
