@@ -10,20 +10,29 @@
         :root {
             --accent: #00d2ff;
             --bg-dark: #0f0c29;
+            --glass: rgba(255, 255, 255, 0.05);
         }
+
+        /* থিম কন্ট্রোল - অ্যাডমিন থেকে যা আসবে */
+        body.dark-ocean { background: radial-gradient(circle, #1a1f35, #070b14); --accent: #00f2ff; }
+        body.neon-night { background: radial-gradient(circle, #2b0035, #0a0014); --accent: #ff00ff; }
+        body.gold-luxury { background: radial-gradient(circle, #2c1e01, #000000); --accent: #ffcc00; }
+        body.cyber-punk { background: #000; --accent: #39ff14; }
+
         body { 
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); 
             height: 100vh; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Poppins', sans-serif;
             overflow: hidden;
             margin: 0;
+            transition: 0.5s;
         }
+
         .auth-card { 
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(25px); 
+            background: var(--glass); 
+            backdrop-filter: blur(20px); 
             border: 1px solid rgba(255, 255, 255, 0.1); 
             border-radius: 30px; 
             padding: 40px; 
@@ -31,105 +40,93 @@
             max-width: 420px; 
             text-align: center;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            animation: slideUp 0.8s ease-out;
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .logo-area i { font-size: 3.5rem; color: var(--accent); margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.5)); }
-        .input-group { position: relative; margin-bottom: 25px; }
-        .input-group i { position: absolute; left: 18px; top: 15px; color: var(--accent); z-index: 10; font-size: 1.1rem; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        .logo-area i { font-size: 3.5rem; color: var(--accent); margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--accent)); }
+        
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group i { position: absolute; left: 18px; top: 15px; color: var(--accent); z-index: 10; }
+        
         .form-control { 
             background: rgba(255, 255, 255, 0.06) !important; 
             border: 1px solid rgba(255, 255, 255, 0.1) !important; 
             border-radius: 15px !important; 
             padding: 14px 14px 14px 50px !important; 
             color: #fff !important; 
-            transition: 0.3s;
         }
-        .form-control:focus { 
-            border-color: var(--accent) !important; 
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2) !important;
-            background: rgba(255, 255, 255, 0.1) !important;
-        }
-        .toggle-password { position: absolute; right: 18px; top: 15px; cursor: pointer; color: #777; z-index: 10; }
+
+        .form-control:focus { border-color: var(--accent) !important; box-shadow: 0 0 15px var(--accent); }
+
         .btn-auth { 
-            background: linear-gradient(45deg, #00d2ff, #3a7bd5); 
+            background: var(--accent); 
             border: none; 
             border-radius: 15px; 
             padding: 14px; 
             width: 100%; 
-            color: #fff; 
+            color: #000; 
             font-weight: 800; 
-            letter-spacing: 1px;
             text-transform: uppercase;
-            transition: 0.4s;
-            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3);
+            box-shadow: 0 5px 15px var(--accent);
+            transition: 0.3s;
         }
-        .btn-auth:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(0, 210, 255, 0.4); opacity: 0.9; }
-        #dynamicMsg { color: #bbb; margin-bottom: 35px; font-size: 0.95rem; line-height: 1.4; }
+
+        .btn-auth:hover { transform: translateY(-3px); opacity: 0.9; }
+        
+        #dynamicMsg { color: #ccc; margin-bottom: 25px; font-size: 0.9rem; font-weight: 300; }
     </style>
 </head>
-<body>
+<body class="dark-ocean" id="bodyTheme">
     <div class="auth-card">
-        <div class="logo-area"><i class="fas fa-shield-alt"></i></div>
+        <div class="logo-area"><i class="fas fa-fingerprint"></i></div>
         <h2 style="color: #fff; font-weight: 800; letter-spacing: 2px;">LOGIN</h2>
-        
-        <p id="dynamicMsg">অপেক্ষা করুন...</p>
+        <p id="dynamicMsg">প্যানেলে প্রবেশের জন্য আপনার তথ্য দিন</p>
         
         <form id="loginForm">
             <div class="input-group">
                 <i class="fas fa-envelope"></i>
-                <input type="email" id="email" class="form-control" placeholder="ইমেইল অ্যাড্রেস দিন" required>
+                <input type="email" id="email" class="form-control" placeholder="ইমেইল অ্যাড্রেস" required>
             </div>
             <div class="input-group">
                 <i class="fas fa-lock"></i>
-                <input type="password" id="password" class="form-control" placeholder="পাসওয়ার্ড দিন" required>
-                <span class="toggle-password" onclick="togglePass()"><i class="fas fa-eye-slash" id="eyeIcon"></i></span>
+                <input type="password" id="password" class="form-control" placeholder="পাসওয়ার্ড" required>
             </div>
-            <button type="submit" class="btn-auth">প্রবেশ করুন</button>
+            <button type="submit" class="btn-auth" id="loginBtn">প্রবেশ করুন</button>
         </form>
         
-        <div style="margin-top: 25px; font-size: 0.9rem; color: #aaa;">
-            অ্যাকাউন্ট নেই? <a href="register.html" style="color: var(--accent); text-decoration: none; font-weight: bold;">রেজিস্ট্রেশন করুন</a>
+        <div style="margin-top: 25px; font-size: 0.85rem; color: #aaa;">
+            নতুন ইউজার? <a href="register.html" style="color: var(--accent); text-decoration: none; font-weight: bold;">একাউন্ট খুলুন</a>
         </div>
     </div>
 
     <script>
-        // ১. পেজ লোড হলে সেটিংস নিয়ে আসা
+        // ১. অ্যাডমিন সেটিংস ও থিম লোড করা
         window.onload = async () => {
             try {
                 const res = await fetch('/api/admin/get-settings');
-                if (res.ok) {
-                    const settings = await res.json();
-                    document.getElementById('dynamicMsg').innerText = settings.loginWelcomeMessage || "আমাদের প্যানেলে আপনাকে স্বাগতম";
-                } else {
-                    document.getElementById('dynamicMsg').innerText = "আমাদের প্যানেলে আপনাকে স্বাগতম";
+                const settings = await res.json();
+                
+                // যদি সাইট বন্ধ থাকে তবে রিডাইরেক্ট করবে
+                if (settings.isSiteActive === false) {
+                    document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:20%;'>Site is under maintenance.</h1>";
+                    return;
                 }
-            } catch (err) {
-                document.getElementById('dynamicMsg').innerText = "আমাদের প্যানেলে আপনাকে স্বাগতম";
-            }
+
+                // থিম সেট করা
+                if(settings.themeConfig?.loginTheme) {
+                    document.getElementById('bodyTheme').className = settings.themeConfig.loginTheme;
+                }
+            } catch (err) { console.log("Settings load failed"); }
         };
 
-        function togglePass() {
-            const input = document.getElementById('password');
-            const icon = document.getElementById('eyeIcon');
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.replace("fa-eye-slash", "fa-eye");
-            } else {
-                input.type = "password";
-                icon.classList.replace("fa-eye", "fa-eye-slash");
-            }
-        }
-
-        // ২. লগইন ফাংশন (উন্নত করা হয়েছে)
+        // ২. লগইন প্রসেস
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
-            btn.innerText = "অপেক্ষা করুন...";
-            btn.disabled = true;
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.innerText = "যাচাই করা হচ্ছে...";
+            loginBtn.disabled = true;
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -144,19 +141,22 @@
                 const data = await res.json();
                 
                 if (res.ok) {
-                    alert("লগইন সফল!");
-                    window.location.href = data.redirect;
+                    // সফল হলে ইউজার আইডি সেভ করে ড্যাশবোর্ডে পাঠানো
+                    localStorage.setItem('userId', data.userId);
+                    localStorage.setItem('role', data.role);
+                    window.location.href = data.redirect; // অ্যাডমিন হলে অ্যাডমিন প্যানেল, ইউজার হলে ড্যাশবোর্ড
                 } else {
-                    alert(data.error || "লগইন ব্যর্থ হয়েছে!");
+                    alert(data.error || "ভুল ইমেইল বা পাসওয়ার্ড!");
+                    loginBtn.innerText = "প্রবেশ করুন";
+                    loginBtn.disabled = false;
                 }
             } catch (err) {
-                // এখানে সেই পুরনো মেসেজটি সরিয়ে সাধারণ মেসেজ দেওয়া হয়েছে
-                alert("সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। দয়া করে আপনার ইন্টারনেট চেক করুন।");
-            } finally {
-                btn.innerText = "প্রবেশ করুন";
-                btn.disabled = false;
+                alert("সার্ভার কানেকশন এরর!");
+                loginBtn.innerText = "প্রবেশ করুন";
+                loginBtn.disabled = false;
             }
         });
     </script>
 </body>
 </html>
+
