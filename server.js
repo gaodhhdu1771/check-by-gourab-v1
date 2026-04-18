@@ -12,12 +12,12 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 require('dotenv').config();
 
-// ১. মিডলওয়্যার ইম্পোর্ট
+// ১. অ্যাডমিন মিডলওয়্যার ইম্পোর্ট
 const adminAuth = require('./middleware/adminAuth');
 
 const app = express();
 
-// ২. মডেল লোড (নিশ্চিত করো User.js মেইন ফোল্ডারে আছে)
+// ২. মডেল লোড
 const User = require('./User');
 
 // --- মিডলওয়্যার সেটআপ ---
@@ -30,14 +30,14 @@ app.use(mongoSanitize());
 app.use(requestIp.mw());
 app.use(useragent.express());
 
-// --- ৩. স্ট্যাটিক ফাইল হ্যান্ডলিং (তোমার ডাবল public ফোল্ডার সাপোর্ট করবে) ---
-const paths = [
+// --- ৩. অটোমেটিক ফাইল পাথ হ্যান্ডলিং (স্মার্ট ডিটেকশন) ---
+const publicPaths = [
     path.join(__dirname, 'public', 'public'),
     path.join(__dirname, 'public'),
     path.join(__dirname)
 ];
 
-paths.forEach(p => {
+publicPaths.forEach(p => {
     if (fs.existsSync(p)) {
         app.use(express.static(p));
     }
@@ -50,7 +50,7 @@ mongoose.connect(dbUri)
     .then(() => console.log("✅ Database Connected Successfully"))
     .catch(err => console.log("❌ DB Connection Error:", err));
 
-// --- ৫. লগইন এপিআই (সংশোধিত অ্যাডমিন রিডাইরেক্ট) ---
+// --- ৫. লগইন এপিআই (পেন্ডিং ইউজারদের আটকানোর জন্য) ---
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -61,13 +61,14 @@ app.post('/api/auth/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: "ভুল পাসওয়ার্ড!" });
 
+        // যদি ইউজার পেন্ডিং থাকে তবে তাকে পেন্ডিং পেজে পাঠানো হবে
         if (user.status === 'Pending') {
             return res.json({ userId: user._id, role: user.role, redirect: "/pending.html" });
         } else if (user.status === 'Blocked') {
             return res.status(403).json({ error: "আপনার অ্যাকাউন্টটি ব্লক করা হয়েছে!" });
         }
 
-        // গৌরব, এখানে রোল চেক করে সঠিক পেজে পাঠানো হচ্ছে
+        // অ্যাডমিন নাকি ইউজার সেই অনুযায়ী রিডাইরেক্ট
         const redirectPath = (user.role === 'admin') ? "/admin-control.html" : "/dashboard.html";
         
         res.json({ 
@@ -81,7 +82,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// --- ৬. রেজিস্ট্রেশন এপিআই ---
+// --- ৬. রেজিস্ট্রেশন এপিআই (ডিফল্ট পেন্ডিং থাকবে) ---
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, phone, email, password } = req.body;
@@ -91,8 +92,9 @@ app.post('/api/auth/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = new User({ 
             name, phone, email, password: hashedPassword,
-            status: 'Pending', role: 'user',
-            permissions: { activeCheckers: [] }
+            status: 'Pending', // নতুন ইউজাররা সরাসরি ঢুকতে পারবে না
+            role: 'user',
+            permissions: { activeCheckers: [] } // শুরুতে কোনো টুলস থাকবে না
         });
 
         await newUser.save();
@@ -102,7 +104,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// --- ৭. অ্যাডমিন কন্ট্রোল এপিআই ---
+// --- ৭. অ্যাডমিন এপিআই ---
 app.get('/api/admin/users', adminAuth, async (req, res) => {
     try {
         const users = await User.find().select('-password');
@@ -122,7 +124,7 @@ app.post('/api/admin/manage-user', adminAuth, async (req, res) => {
     }
 });
 
-// --- ৮. ফাইল রাউটিং (স্মার্ট পাথ ডিটেকশন) ---
+// --- ৮. ফাইল রাউটিং (এরর ফিক্স) ---
 app.get('*', (req, res) => {
     const checkFiles = [
         path.join(__dirname, 'public', 'index.html'),
@@ -135,7 +137,7 @@ app.get('*', (req, res) => {
             return res.sendFile(file);
         }
     }
-    res.status(404).send("Gourab, মেইন ফাইল পাওয়া যায়নি। গিটহাবের public ফোল্ডার চেক করো।");
+    res.status(404).send("মেইন ফাইল পাওয়া যায়নি। গিটহাবের public ফোল্ডার চেক করো।");
 });
 
 const PORT = process.env.PORT || 10000;
