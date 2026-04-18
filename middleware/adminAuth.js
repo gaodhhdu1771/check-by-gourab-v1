@@ -1,23 +1,25 @@
-const User = require('../User'); // এখানে '../models/User' ছিল, সেটা কমিয়ে '../User' করা হয়েছে
+const User = require('./User'); // তোমার ফাইল স্ট্রাকচার অনুযায়ী পাথ ঠিক করা হয়েছে
 
 const adminAuth = async (req, res, next) => {
     try {
-        // রিকোয়েস্ট থেকে userId চেক করা (Headers, Body বা Query থেকে)
-        const userId = req.headers['userid'] || req.body.userId || req.query.userId;
+        // Headers (userid), Body বা Query থেকে আইডি নেওয়া
+        const userId = req.headers['userid'] || req.headers['user-id'] || req.body.userId || req.query.userId;
 
         if (!userId) {
-            return res.status(401).json({ error: "অ্যাক্সেস ডিনাইড! ইউজার আইডি প্রদান করা হয়নি।" });
+            return res.status(401).json({ error: "অ্যাক্সেস ডিনাইড! ইউজার আইডি নেই।" });
         }
 
         const user = await User.findById(userId);
 
-        // তোমার এডমিন ইমেইল চেক
+        // ১. ডাটাবেজে রোল 'admin' হতে হবে 
+        // ২. অথবা তোমার পার্সোনাল ইমেইল হতে হবে
         if (user && (user.role === 'admin' || user.email === 'gourabmon112233@gmail.com')) {
-            next(); // অনুমতি দেওয়া হলো
+            next(); // গৌরব, তুমি ভেতরে যাওয়ার অনুমতি পেলে!
         } else {
-            res.status(403).json({ error: "অননুমোদিত! শুধুমাত্র গৌরব এটি অ্যাক্সেস করতে পারবে।" });
+            res.status(403).json({ error: "অননুমোদিত! এটি শুধুমাত্র গৌরবের জন্য সংরক্ষিত।" });
         }
     } catch (err) {
+        console.error("Auth Error:", err);
         res.status(500).json({ error: "সার্ভার অথোরাইজেশন এরর!" });
     }
 };
