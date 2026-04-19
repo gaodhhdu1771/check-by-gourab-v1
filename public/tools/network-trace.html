@@ -75,55 +75,165 @@
     async function runDiagnostics() {
       const resultsDiv = document.getElementById('results');
       const placeholder = document.getElementById('placeholder');
-      
-      placeholder.innerHTML = `
-        <div class="flex flex-col items-center gap-4">
-            <div class="w-12 h-12 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
-            <p class="text-sky-400 font-medium">Fetching real-time data from 3 global nodes...</p>
+      <!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Trace - Real IP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { font-family: system-ui, sans-serif; }
+    .card { background: #1f2937; border: 1px solid #374151; }
+    .copy-btn:hover { background-color: #10b981; color: white; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
+  <div class="max-w-4xl mx-auto p-6">
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-bold text-emerald-400 flex items-center justify-center gap-3">
+        <i class="fas fa-network-wired"></i> Network Trace
+      </h1>
+      <p class="text-zinc-400">Whoer.net Style • Fast • Auto Detect</p>
+    </div>
+
+    <div id="loading" class="hidden text-center py-16">
+      <i class="fas fa-spinner fa-spin text-5xl text-emerald-400"></i>
+      <p class="mt-4 text-lg">Detecting your real IP...</p>
+    </div>
+
+    <div id="result" class="grid md:grid-cols-2 gap-6"></div>
+
+    <div class="mt-10 flex justify-center gap-4 flex-wrap">
+      <button onclick="refreshTrace()" 
+              class="bg-emerald-600 hover:bg-emerald-700 px-8 py-3 rounded-2xl font-medium flex items-center gap-2 transition">
+        <i class="fas fa-redo"></i> Refresh Trace
+      </button>
+      <button onclick="checkCustomIP()" 
+              class="bg-violet-600 hover:bg-violet-700 px-8 py-3 rounded-2xl font-medium transition">
+        Custom IP Trace
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let lastCheckTime = null;
+
+    function copyToClipboard(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const original = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-check"></i>`;
+        setTimeout(() => btn.innerHTML = original, 1400);
+      });
+    }
+
+    function createRow(label, value, copyable = true) {
+      if (!value) return '';
+      return `
+        <div class="flex justify-between items-center py-4 border-b border-zinc-700 last:border-none">
+          <span class="text-zinc-400">${label}</span>
+          <div class="flex items-center gap-3">
+            <span class="font-medium text-right">${value}</span>
+            ${copyable ? `
+              <button onclick="copyToClipboard('${value}', this)" 
+                      class="copy-btn text-xs bg-zinc-800 px-4 py-1.5 rounded-xl text-emerald-400">
+                <i class="fas fa-copy"></i>
+              </button>` : ''}
+          </div>
         </div>`;
+    }
+
+    function updateTimeAgo() {
+      if (!lastCheckTime) return;
+      const seconds = Math.floor((Date.now() - lastCheckTime) / 1000);
+      const el = document.getElementById('timeAgo');
+      if (el) el.textContent = `${seconds} seconds ago`;
+    }
+
+    async function fetchIPData(ip = '') {
+      const apis = [
+        ip ? `https://ipapi.co/${ip}/json/` : `https://ipapi.co/json/`,
+        `https://ip-api.com/json/${ip}`
+      ];
+
+      for (let url of apis) {
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.ip || data.query) return data;
+          }
+        } catch (e) {}
+      }
+      throw new Error("Network error");
+    }
+
+    function showResult(data) {
+      lastCheckTime = Date.now();
+
+      const anonymity = data.proxy ? 88 : 64;
+      const vpnText = data.proxy ? "Detected" : "Not Detected";
+      const vpnColor = data.proxy ? "text-amber-400" : "text-emerald-400";
+
+      const html = `
+        <div class="card rounded-3xl p-8">
+          <div class="flex justify-between items-start mb-8">
+            <div>
+              <div class="text-emerald-400 text-sm">YOUR PUBLIC IP</div>
+              <div class="font-mono text-4xl font-bold tracking-wider">${data.ip}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-5xl font-bold \( {anonymity > 70 ? 'text-emerald-400' : 'text-amber-400'}"> \){anonymity}%</div>
+              <div class="text-xs text-zinc-400">Anonymity</div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            \( {createRow("Country", ` \){data.country_name || 'N/A'} (${data.country || 'N/A'})`)}
+            ${createRow("Region", data.region || 'N/A')}
+            ${createRow("City", data.city || 'N/A')}
+            ${createRow("Timezone", data.timezone || 'N/A')}
+            ${createRow("Local Time", new Date().toLocaleString('en-US', {timeZone: data.timezone || 'Asia/Dhaka'}))}
+            ${createRow("ISP", data.org || 'Unknown')}
+            \( {createRow("VPN / Proxy", `<span class=" \){vpnColor}">${vpnText}</span>`, false)}
+            ${createRow("Device", /Android/i.test(navigator.userAgent) ? "Android" : "Desktop / Mobile")}
+            ${createRow("Checked", `<span id="timeAgo">0 seconds ago</span>`, false)}
+          </div>
+        </div>
+      `;
+
+      document.getElementById("result").innerHTML = html;
+      setInterval(updateTimeAgo, 1000);
+    }
+
+    async function refreshTrace() {
+      document.getElementById("loading").classList.remove("hidden");
+      document.getElementById("result").innerHTML = "";
 
       try {
-        const res = await fetch('https://ipapi.co/json/');
-        const data = await res.json();
-        
-        placeholder.className = "hidden";
-        document.getElementById('footerAction').className = "mt-8 pt-8 border-t border-slate-700/50 flex justify-center";
-
-        const fields = [
-          { label: 'Network IP', value: data.ip, icon: 'fa-network-wired' },
-          { label: 'Location', value: `${data.city}, ${data.country_name}`, icon: 'fa-map-marker-alt' },
-          { label: 'ISP Vendor', value: data.org, icon: 'fa-server' },
-          { label: 'Timezone', value: data.timezone, icon: 'fa-clock' },
-          { label: 'Local Time', value: new Date().toLocaleTimeString(), icon: 'fa-hourglass-half' },
-          { label: 'Region Code', value: data.region_code, icon: 'fa-map' },
-          { label: 'Zip Code', value: data.postal, icon: 'fa-mail-bulk' },
-          { label: 'VPN / Proxy', value: data.proxy ? 'DETECTED' : 'CLEAN', icon: 'fa-user-secret', color: data.proxy ? 'text-red-400' : 'text-emerald-400' }
-        ];
-
-        let html = '';
-        fields.forEach(f => {
-          html += `
-            <div class="status-card p-5 rounded-2xl flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
-                  <i class="fas ${f.icon} text-sky-400"></i>
-                </div>
-                <div>
-                  <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">${f.label}</p>
-                  <p class="text-sm font-bold text-white ${f.color || ''}">${f.value || 'Unknown'}</p>
-                </div>
-              </div>
-              <button onclick="navigator.clipboard.writeText('${f.value}')" class="text-slate-600 hover:text-sky-400 transition-colors">
-                <i class="fas fa-copy"></i>
-              </button>
-            </div>`;
-        });
-
-        resultsDiv.innerHTML = html;
-      } catch(e) {
-        placeholder.innerHTML = '<p class="text-red-400">Scan Failed. Check Connection.</p>';
+        const data = await fetchIPData("");
+        showResult(data);
+      } catch (e) {
+        document.getElementById("result").innerHTML = `
+          <div class="col-span-2 bg-red-950 p-10 rounded-3xl text-center">
+            <p class="text-red-300">Could not detect IP.<br>Please check your internet.</p>
+          </div>`;
+      } finally {
+        document.getElementById("loading").classList.add("hidden");
       }
     }
+
+    function checkCustomIP() {
+      const ip = prompt("Enter any IP address:");
+      if (!ip) return;
+      alert("Custom IP check feature will be added soon.\n\nFor now use Refresh button.");
+    }
+
+    // Auto start - very fast
+    window.onload = () => {
+      refreshTrace();
+    };
   </script>
 </body>
 </html>
