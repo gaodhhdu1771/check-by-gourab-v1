@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ====================== API ROUTES ======================
 
-// ১. রেজিস্ট্রেশন API (ভিডিওর সেই মডাল কানেকশন)
+// ১. রেজিস্ট্রেশন API
 app.post('/api/auth/register', async (req, res) => {
     const { name, phone, email, password } = req.body;
     try {
@@ -36,7 +36,7 @@ app.post('/api/auth/register', async (req, res) => {
         user = new User({
             name, phone, email,
             password: hashedPassword,
-            status: 'Pending', // ডিফল্ট পেন্ডিং থাকবে
+            status: 'Pending',
             role: 'user'
         });
 
@@ -47,7 +47,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// ২. লগইন API (অ্যাডমিন মেসেজ লজিক সহ)
+// ২. লগইন API
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -61,7 +61,6 @@ app.post('/api/auth/login', async (req, res) => {
             return res.json({ userId: user._id, redirect: "/pending.html" });
         }
 
-        // অ্যাডমিন হলে স্পেশাল মেসেজ পাঠানো হবে ফ্রন্টএন্ডে
         let welcomeMsg = "";
         if (user.role === 'admin') {
             welcomeMsg = `প্রিয় এডমিন আপনাকে স্বাগতম আপনার পেজে। আপনার পেজ আপনি এখান থেকে সঠিকভাবে পরিচালনা করতে পারেন।`;
@@ -91,20 +90,31 @@ app.get('/api/user/me', async (req, res) => {
     }
 });
 
-// ====================== PROTECTED TOOLS ======================
-// শুধু Admin বা অনুমোদিত ইউজাররা tools ফোল্ডারের ফাইল পাবে
-app.get('/tools/:filename', adminAuth, (req, res) => {
-    const filename = req.params.filename;
-    const filePath = path.join(__dirname, 'public', 'tools', filename);
+// ====================== ADMIN ACTIONS (Html বাটনের জন্য জরুরি) ======================
 
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.status(404).send('টুলটি খুঁজে পাওয়া যায়নি!');
+// ৪. সকল ইউজার লিস্ট দেখার এন্ডপয়েন্ট
+app.get('/api/admin/users', adminAuth, async (req, res) => {
+    try {
+        const users = await User.find({ role: 'user' }).select('-password');
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: "ইউজার লিস্ট লোড করা যায়নি!" });
     }
 });
 
-// ====================== ADMIN ACTIONS ======================
+// ৫. সাইট সেটিংস আপডেট (Site Kill, Reg Open, Notice ইত্যাদি)
+app.post('/api/admin/update-settings', adminAuth, async (req, res) => {
+    try {
+        // এখানে তুমি ডাটাবেজের একটি Settings কালেকশনে ডাটা সেভ করতে পারো
+        // আপাতত সাকসেস মেসেজ পাঠানো হচ্ছে
+        console.log("Settings Updated:", req.body);
+        res.json({ message: "সেটিংস আপডেট সফল!" });
+    } catch (err) {
+        res.status(500).json({ error: "সেটিংস আপডেট ব্যর্থ!" });
+    }
+});
+
+// ৬. ইউজার এপ্রুভ বা ব্লক করা
 app.post('/api/admin/manage-user', adminAuth, async (req, res) => {
     try {
         const { targetUserId, status, checkers } = req.body;
@@ -118,6 +128,18 @@ app.post('/api/admin/manage-user', adminAuth, async (req, res) => {
     }
 });
 
+// ====================== PROTECTED TOOLS ======================
+app.get('/tools/:filename', adminAuth, (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, 'public', 'tools', filename);
+
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send('টুলটি খুঁজে পাওয়া যায়নি!');
+    }
+});
+
 // ====================== HTML ROUTES ======================
 app.get('/admin-control.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin-control.html')));
 app.get('/dashboard.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
@@ -125,10 +147,10 @@ app.get('/pending.html', (req, res) => res.sendFile(path.join(__dirname, 'public
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 // ====================== SERVER START ======================
-const DB_URI = process.env.MONGO_URI || "তোমার_ডাটাবেজ_লিংক";
+const DB_URI = process.env.MONGO_URI || "YOUR_MONGODB_CONNECTION_STRING";
 mongoose.connect(DB_URI).then(() => {
     const PORT = process.env.PORT || 10000;
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`🚀 Gourab System Live on Port ${PORT}`);
     });
-});
+}).catch(err => console.error("Database connection failed:", err));
