@@ -19,6 +19,8 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(express.json());
 app.use(mongoSanitize());
+
+// Static Files: ডিজাইন (CSS/JS) লোড করার জন্য এটি খুব জরুরি
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ====================== API ROUTES ======================
@@ -58,12 +60,10 @@ app.post('/api/auth/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: "ভুল পাসওয়ার্ড!" });
 
-        // ইউজার ব্লকড থাকলে লগইন করতে দিবে না
         if (user.status === 'Blocked') {
             return res.status(403).json({ error: "আপনার অ্যাকাউন্টটি ব্লক করা হয়েছে!" });
         }
 
-        // পেন্ডিং থাকলে পেন্ডিং পেজে পাঠাবে
         if (user.status === 'Pending' && user.role !== 'admin') {
             return res.json({ userId: user._id, redirect: "/pending.html" });
         }
@@ -114,14 +114,14 @@ app.get('/api/admin/users', adminAuth, async (req, res) => {
 // ৫. সেটিংস আপডেট
 app.post('/api/admin/update-settings', adminAuth, async (req, res) => {
     try {
-        console.log("Settings Updated by Admin:", req.body);
+        console.log("Settings Updated:", req.body);
         res.json({ message: "সেটিংস আপডেট সফল!" });
     } catch (err) {
         res.status(500).json({ error: "সেটিংস আপডেট ব্যর্থ!" });
     }
 });
 
-// ৬. ইউজার ম্যানেজমেন্ট (Approve/Block/Permissions)
+// ৬. ইউজার ম্যানেজমেন্ট
 app.post('/api/admin/manage-user', adminAuth, async (req, res) => {
     try {
         const { targetUserId, status, checkers } = req.body;
@@ -152,17 +152,13 @@ app.get('/admin-control.html', (req, res) => res.sendFile(path.join(__dirname, '
 app.get('/dashboard.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/pending.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'pending.html')));
 
-// ক্যাচ-অল রুট (ইন্ডেক্স ফাইলের জন্য)
+// ক্যাচ-অল রুট: যাতে কোনো ইউজার সরাসরি লিঙ্কে ঢুকলে index.html লোড হয়
 app.get('*', (req, res) => {
-    const indexPath = path.join(__dirname, 'public', 'index.html');
-    if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath);
-    } else {
-        res.status(404).send("মেইন ফাইল খুঁজে পাওয়া যায়নি!");
-    }
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // ====================== SERVER START ======================
+// তোমার দেওয়া MongoDB লিঙ্কটি এখানে ডিফল্ট হিসেবে যোগ করা হয়েছে
 const DB_URI = process.env.MONGO_URI || "mongodb+srv://gourabadmin:gourab2006@cluster0.tyrqc0k.mongodb.net/CheckByGourab?retryWrites=true&w=majority";
 
 mongoose.connect(DB_URI).then(() => {
