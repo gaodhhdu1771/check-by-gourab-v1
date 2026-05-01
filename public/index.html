@@ -35,9 +35,13 @@
       background: linear-gradient(90deg, #22d3ee, #c026d3);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .neon-btn:hover {
+    .neon-btn:hover:not(:disabled) {
       transform: translateY(-4px) scale(1.03);
       box-shadow: 0 0 40px #c026d3, 0 0 60px #22d3ee;
+    }
+    .neon-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
     .form-card {
       background: rgba(255, 255, 255, 0.06);
@@ -61,11 +65,11 @@
     .toggle-password {
       position: absolute;
       right: 20px;
-      top: 50%;
+      top: 70%;
       transform: translateY(-50%);
       color: #94a3b8;
       cursor: pointer;
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       transition: all 0.3s;
     }
     .toggle-password:hover {
@@ -87,120 +91,116 @@
 
   <div class="w-full max-w-md mx-auto relative z-10">
     <div class="flex justify-center mb-6">
-      <div class="w-24 h-24 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-3xl flex items-center justify-center glow-logo shadow-2xl border border-white/20">
-        <i class="fa-solid fa-bolt text-white text-5xl"></i>
+      <div class="w-20 h-20 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-3xl flex items-center justify-center glow-logo shadow-2xl border border-white/20">
+        <i class="fa-solid fa-bolt text-white text-4xl"></i>
       </div>
     </div>
 
-    <div class="text-center mb-10">
+    <div class="text-center mb-8">
       <h1 class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">
         Check by Gourab-v1
       </h1>
-      <p class="text-cyan-300/80 text-sm mt-2 tracking-wide">Advanced Multi-Tool Checker System</p>
+      <p class="text-cyan-300/80 text-xs mt-2 tracking-wide">Advanced Multi-Tool Checker System</p>
     </div>
 
-    <div class="flex bg-white/5 backdrop-blur-xl rounded-3xl p-1.5 mb-8 border border-white/10">
-      <button onclick="switchTab(0)" id="tab-login"
-        class="flex-1 py-4 rounded-2xl font-semibold transition-all text-lg">Login</button>
-      <button onclick="switchTab(1)" id="tab-register"
-        class="flex-1 py-4 rounded-2xl font-semibold transition-all text-lg">Register</button>
+    <div class="flex bg-white/5 backdrop-blur-xl rounded-2xl p-1 mb-6 border border-white/10">
+      <button onclick="switchTab(0)" id="tab-login" class="flex-1 py-3 rounded-xl font-semibold transition-all">Login</button>
+      <button onclick="switchTab(1)" id="tab-register" class="flex-1 py-3 rounded-xl font-semibold transition-all">Register</button>
     </div>
 
-    <div id="login-form" class="form-card rounded-3xl p-8">
-      <div class="space-y-7">
+    <div id="login-form" class="form-card rounded-3xl p-6">
+      <div class="space-y-5">
         <div>
-          <label class="block text-sm mb-2 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-envelope"></i> Gmail</label>
+          <label class="block text-xs mb-2 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-envelope"></i> Gmail</label>
           <input type="email" id="login-email" placeholder="আপনার Gmail দিন" 
-            class="input-field w-full rounded-2xl px-6 py-4 outline-none text-white placeholder:text-gray-400 text-base"/>
+            class="input-field w-full rounded-xl px-5 py-3 outline-none text-white placeholder:text-gray-500"/>
         </div>
         <div class="password-container">
-          <label class="block text-sm mb-2 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-lock"></i> Password</label>
+          <label class="block text-xs mb-2 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-lock"></i> Password</label>
           <input type="password" id="login-pass" placeholder="Password দিন" 
-            class="input-field w-full rounded-2xl px-6 py-4 outline-none text-white placeholder:text-gray-400 text-base"/>
+            class="input-field w-full rounded-xl px-5 py-3 outline-none text-white placeholder:text-gray-500"/>
           <i onclick="togglePassword('login-pass', this)" class="fa-solid fa-eye toggle-password"></i>
         </div>
-        <button onclick="handleLogin()" 
-          class="neon-btn w-full py-4 rounded-2xl font-bold text-lg shadow-xl flex items-center justify-center gap-3">
+        <button id="btn-login" onclick="handleLogin()" 
+          class="neon-btn w-full py-4 rounded-xl font-bold text-lg shadow-xl flex items-center justify-center gap-3">
           <i class="fa-solid fa-right-to-bracket"></i> Login করুন
         </button>
       </div>
-      <p class="text-center mt-8 text-sm text-gray-400">
+      <p class="text-center mt-6 text-sm text-gray-400">
         একাউন্ট নেই? <span onclick="switchTab(1)" class="text-purple-400 hover:text-purple-300 cursor-pointer font-medium">Register করুন</span>
       </p>
     </div>
 
-    <div id="register-form" class="form-card rounded-3xl p-8 hidden">
-      <div class="space-y-6">
+    <div id="register-form" class="form-card rounded-3xl p-6 hidden">
+      <div class="space-y-4">
         <div>
-          <label class="block text-sm mb-2 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-user"></i> নাম</label>
+          <label class="block text-xs mb-1 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-user"></i> নাম</label>
           <input type="text" id="reg-name" placeholder="আপনার পুরো নাম" 
-            class="input-field w-full rounded-2xl px-6 py-4 outline-none text-white placeholder:text-gray-400"/>
+            class="input-field w-full rounded-xl px-5 py-3 outline-none text-white placeholder:text-gray-500"/>
         </div>
         <div>
-          <label class="block text-sm mb-2 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-phone"></i> Phone Number</label>
+          <label class="block text-xs mb-1 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-phone"></i> Phone Number</label>
           <input type="tel" id="reg-phone" placeholder="01XXXXXXXXXX" 
-            class="input-field w-full rounded-2xl px-6 py-4 outline-none text-white placeholder:text-gray-400"/>
+            class="input-field w-full rounded-xl px-5 py-3 outline-none text-white placeholder:text-gray-500"/>
         </div>
         <div>
-          <label class="block text-sm mb-2 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-envelope"></i> Gmail</label>
+          <label class="block text-xs mb-1 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-envelope"></i> Gmail</label>
           <input type="email" id="reg-email" placeholder="আপনার Gmail দিন" 
-            class="input-field w-full rounded-2xl px-6 py-4 outline-none text-white placeholder:text-gray-400"/>
+            class="input-field w-full rounded-xl px-5 py-3 outline-none text-white placeholder:text-gray-500"/>
         </div>
         <div class="password-container">
-          <label class="block text-sm mb-2 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-lock"></i> Password</label>
+          <label class="block text-xs mb-1 text-cyan-200 flex items-center gap-2"><i class="fa-solid fa-lock"></i> Password</label>
           <input type="password" id="reg-pass" placeholder="Password তৈরি করুন" 
-            class="input-field w-full rounded-2xl px-6 py-4 outline-none text-white placeholder:text-gray-400"/>
+            class="input-field w-full rounded-xl px-5 py-3 outline-none text-white placeholder:text-gray-500"/>
           <i onclick="togglePassword('reg-pass', this)" class="fa-solid fa-eye toggle-password"></i>
         </div>
-        <button onclick="handleRegister()" 
-          class="neon-btn w-full py-4 rounded-2xl font-bold text-lg shadow-xl flex items-center justify-center gap-3">
+        <button id="btn-reg" onclick="handleRegister()" 
+          class="neon-btn w-full py-4 rounded-xl font-bold text-lg shadow-xl flex items-center justify-center gap-3">
           <i class="fa-solid fa-user-plus"></i> Register করুন
         </button>
       </div>
-      <p class="text-center mt-8 text-sm text-gray-400">
+      <p class="text-center mt-6 text-sm text-gray-400">
         একাউন্ট আছে? <span onclick="switchTab(0)" class="text-purple-400 hover:text-purple-300 cursor-pointer font-medium">Login করুন</span>
       </p>
     </div>
 
-    <div class="text-center mt-12 text-xs text-gray-500 tracking-widest uppercase">
+    <div class="text-center mt-10 text-[10px] text-gray-500 tracking-widest uppercase">
       Developed by Gourab | 01944035239
     </div>
   </div>
 
   <div id="success-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div class="modal bg-gradient-to-b from-gray-900 to-black border border-white/20 rounded-3xl p-10 max-w-sm w-full text-center shadow-2xl">
-      <div class="w-20 h-20 mx-auto bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center mb-6 shadow-xl">
-        <i class="fa-solid fa-user-plus text-white text-4xl"></i>
+    <div class="modal bg-gradient-to-b from-gray-900 to-black border border-white/20 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="w-16 h-16 mx-auto bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center mb-6 shadow-xl">
+        <i class="fa-solid fa-user-plus text-white text-3xl"></i>
       </div>
-      <h2 class="text-3xl font-bold text-emerald-400 mb-3">🙏 ধন্যবাদ!</h2>
-      <p class="text-gray-300 leading-relaxed">
+      <h2 class="text-2xl font-bold text-emerald-400 mb-2">🙏 ধন্যবাদ!</h2>
+      <p class="text-gray-300 text-sm leading-relaxed">
         গৌরব ভাইয়ের এই সাইটে রেজিস্টার করার জন্য অনেক ধন্যবাদ!<br><br>
         আপনার রিকোয়েস্ট অ্যাডমিনের কাছে পাঠানো হয়েছে। অ্যাডমিন অ্যাকসেপ্ট করলে আপনি লগইন করতে পারবেন।
       </p>
       <button onclick="closeModal()" 
-        class="neon-btn w-full mt-8 py-4 rounded-2xl font-bold text-lg">
+        class="neon-btn w-full mt-6 py-3 rounded-xl font-bold text-lg">
         ✅ ঠিক আছে
       </button>
     </div>
   </div>
 
   <script>
-    // ১. কণা অ্যানিমেশন তৈরি
     function createParticles() {
       const container = document.getElementById('particles');
-      for (let i = 0; i < 90; i++) {
+      for (let i = 0; i < 70; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
-        p.style.width = p.style.height = `${Math.random() * 5 + 2}px`;
+        p.style.width = p.style.height = `${Math.random() * 4 + 2}px`;
         p.style.left = `${Math.random() * 100}vw`;
-        p.style.animationDuration = `${Math.random() * 25 + 15}s`;
-        p.style.animationDelay = `-${Math.random() * 25}s`;
-        p.style.opacity = Math.random() * 0.6 + 0.3;
+        p.style.animationDuration = `${Math.random() * 20 + 10}s`;
+        p.style.animationDelay = `-${Math.random() * 20}s`;
+        p.style.opacity = Math.random() * 0.5 + 0.2;
         container.appendChild(p);
       }
     }
 
-    // ২. ট্যাব পরিবর্তন লজিক
     function switchTab(n) {
       const loginTab = document.getElementById('tab-login');
       const regTab = document.getElementById('tab-register');
@@ -216,31 +216,24 @@
       }
     }
 
-    // ৩. পাসওয়ার্ড দেখা/লুকানো
     function togglePassword(inputId, icon) {
       const input = document.getElementById(inputId);
-      if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      } else {
-        input.type = "password";
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-      }
+      input.type = input.type === "password" ? "text" : "password";
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
     }
 
-    // ৪. রেজিস্ট্রেশন লজিক (Database Connection)
     async function handleRegister() {
+      const btn = document.getElementById('btn-reg');
       const name = document.getElementById('reg-name').value.trim();
       const phone = document.getElementById('reg-phone').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const password = document.getElementById('reg-pass').value.trim();
 
-      if (!name || !phone || !email || !password) {
-        alert("সব তথ্য পূরণ করুন!");
-        return;
-      }
+      if (!name || !phone || !email || !password) return alert("সব তথ্য পূরণ করুন!");
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
 
       try {
         const res = await fetch('/api/auth/register', {
@@ -250,26 +243,28 @@
         });
         
         if (res.ok) {
-          // ভিডিওর মতো মডাল শো করবে
           document.getElementById('success-modal').classList.remove('hidden');
         } else {
           const err = await res.json();
-          alert(err.error || "রেজিস্ট্রেশন ব্যর্থ হয়েছে!");
+          alert(err.error || "রেজিস্ট্রেশন ব্যর্থ!");
         }
       } catch (e) {
-        alert("সার্ভার কানেকশন এরর! আপনার সার্ভার কি চালু আছে?");
+        alert("সার্ভার কানেকশন এরর!");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register করুন';
       }
     }
 
-    // ৫. লগইন লজিক (Database Connection)
     async function handleLogin() {
+      const btn = document.getElementById('btn-login');
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-pass').value.trim();
 
-      if (!email || !password) {
-        alert("ইমেইল এবং পাসওয়ার্ড দিন!");
-        return;
-      }
+      if (!email || !password) return alert("ইমেইল এবং পাসওয়ার্ড দিন!");
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
 
       try {
         const res = await fetch('/api/auth/login', {
@@ -282,19 +277,22 @@
 
         if (res.ok) {
           localStorage.setItem('userId', data.userId);
+          if(data.message) alert(data.message);
           window.location.href = data.redirect;
         } else {
           alert(data.error);
         }
       } catch (e) {
-        alert("লগইন করতে সমস্যা হচ্ছে! সার্ভার চেক করুন।");
+        alert("লগইন এরর!");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login করুন';
       }
     }
 
-    // ৬. মডাল বন্ধ করা
     function closeModal() {
       document.getElementById('success-modal').classList.add('hidden');
-      switchTab(0); // লগইন ট্যাবে নিয়ে যাবে
+      switchTab(0);
     }
 
     window.onload = () => {
